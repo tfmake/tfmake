@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+if [[ ! -f "${WORKDIR}/makefiles/plan/Makefile" ]]; then
+    cat << EOF
+Error: file "${WORKDIR}/makefiles/plan/Makefile" does not exist.
+
+>>> Run 'tfmake makefile --plan' first."
+EOF
+    exit 1
+fi
+
+truncate -s 0 "${WORKDIR}/outputs/plan/nodes"
+truncate -s 0 "${WORKDIR}/outputs/plan/visited"
+
+make -f "${WORKDIR}/makefiles/plan/Makefile"

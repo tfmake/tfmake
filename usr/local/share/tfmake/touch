@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+FILES=${1}
+
+for file in ${FILES}; do
+    echo "touch file: ${file}"
+    touch "${file}"
+done

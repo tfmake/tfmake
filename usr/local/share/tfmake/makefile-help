@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+function usage() {
+  cat << EOF
+Usage:
+  tfmake makefile [options]
+
+  This command generate a Makefile from Terraform modules and their dependencies.
+
+Options:
+  --help            Show this help output.
+  --plan            Generate a Makefile including 'terraform init' and 'terraform plan' as commands.
+  --apply           Generate a Makefile including 'terraform init' and 'terraform apply' as commands.
+EOF
+  exit
+}
+
+usage

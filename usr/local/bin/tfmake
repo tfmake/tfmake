@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+VERSION="0.1.0"
+
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
+WORKDIR="${WORKDIR:-".tfmake/data"}"
+
+export SCRIPT_DIR
+export WORKDIR
+
+function usage() {
+  cat << EOF
+Usage: 
+  tfmake command [options] [args]
+
+Available Commands:
+  apply             Execute apply Makefile.
+  cleanup           Cleanup work directory. 
+  gh-pr-comment     Add a comment to a GitHub pull request.
+  gh-step-summary   Add content to GitHub Step Summary.
+  init              Initialize work directory.
+  makefile          Generate a Makefile from Terraform modules and their dependencies.
+  mermaid           Generate a Mermaid flowchart diagram from Terraform modules and their dependencies.
+  plan              Execute plan Makefile.
+  setup             Install dependencies.
+  summary           Create a Markdown summary.
+  touch             Touch modify files.
+
+Other options:
+  -h, --help        Print this help and exit.
+  --version         Show the current version.
+EOF
+  exit
+}
+
+[[ $# -eq 0 ]] && usage
+
+OPTIONS=""
+CMD="${1}"
+shift
+
+case "${CMD}" in
+-h | --help)
+  usage
+  ;;
+--version)
+  echo "${VERSION}"
+  exit
+  ;;
+apply|cleanup|init|plan|setup|touch)
+  ;;
+makefile|summary)
+  tmp="${CMD}-help"
+
+  if [[ $# -gt 0 ]] && [[ "${1}" == "--help" || "${1}" == "--plan" || "${1}" == "--apply" ]]; then
+    tmp="${CMD}-${1:2}"
+    shift
+  fi
+
+  CMD="${tmp}"
+  ;;
+gh-pr-comment|gh-step-summary|mermaid)
+  OPTIONS="--help"
+
+  if [[ $# -gt 0 ]] && [[ "${1}" == "--help" || "${1}" == "--plan" || "${1}" == "--apply" ]]; then
+    OPTIONS="${1}"
+    shift
+  fi
+  ;;
+*) 
+  usage
+  ;;
+esac
+
+SCRIPT_PATH="${SCRIPT_DIR}/../share/tfmake/${CMD}"
+
+if [[ -n "${OPTIONS}" ]]; then
+    exec "bash" "${SCRIPT_PATH}" "${OPTIONS}" "$@"
+else
+    exec "bash" "${SCRIPT_PATH}" "$@"
+fi

@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+declare -A modules=()
+
+mkdir -p "${WORKDIR}/outputs/plan"
+mkdir -p "${WORKDIR}/makefiles/plan"
+
+while IFS= read -r -d '' file; do
+    module=$(dirname "${file}")
+    modules["${module}"]=""
+
+    echo "${module}" >> "${WORKDIR}/outputs/plan/nodes"
+done <  <(find -- * -name main.tf -type f -print0)
+
+while IFS= read -r -d '' file; do
+    module=$(dirname "${file}")
+    modules["${module}"]=$(yq -o=tsv ".dependencies" "${file}")
+done <  <(find -- * -name .tfmake -type f -print0)
+
+echo "all:" "${!modules[@]}" > "${WORKDIR}/makefiles/plan/Makefile"
+
+for module in "${!modules[@]}"; do
+    cat >> "${WORKDIR}/makefiles/plan/Makefile" << EOF
+
+${module}: ${modules[${module}]} \$(wildcard ${module}/*.tf)
+	@mkdir -p "${WORKDIR}/logs/plan/${module}"
+	@echo "${module}" >> "${WORKDIR}/outputs/plan/visited"
+
+	terraform -chdir="${module}" init -no-color 2>&1 | tee -a "${WORKDIR}/logs/plan/${module}/init.log"
+	terraform -chdir="${module}" plan -out output.plan -no-color 2>&1 | tee -a "${WORKDIR}/logs/plan/${module}/plan.log"
+EOF
+done

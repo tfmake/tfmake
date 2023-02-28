@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+function usage() {
+  cat << EOF
+Usage:
+  tfmake gh-pr-comment [options] NUMBER
+
+  This command add a comment to a GitHub pull request.
+
+Options:
+  --help            Show this help output.
+  --plan            Use the outputs from 'tfmake summary --plan'.
+  --apply           Use the outputs from 'tfmake summary --apply'.
+EOF
+  exit
+}
+
+target=""
+option="${1}"
+shift
+
+case "${option}" in
+--help)
+  usage
+  ;;
+--plan|--apply)
+  target="${option:2}"
+  if [[ $# -eq 0 ]]; then
+    usage
+  else
+    NUMBER="${1}"
+    shift
+  fi
+  ;;
+*) 
+  usage
+  ;;
+esac
+
+gh pr comment "${NUMBER}" -F "${WORKDIR}/outputs/${target}/summary.md"

@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+declare -A modules=()
+
+mkdir -p "${WORKDIR}/outputs/apply"
+mkdir -p "${WORKDIR}/makefiles/apply"
+
+while IFS= read -r -d '' file; do
+    module=$(dirname "${file}")
+    modules["${module}"]=""
+
+    echo "${module}" >> "${WORKDIR}/outputs/apply/nodes"
+done <  <(find -- * -name main.tf -type f -print0)
+
+while IFS= read -r -d '' file; do
+    module=$(dirname "${file}")
+    modules["${module}"]=$(yq -o=tsv ".dependencies" "${file}")
+done <  <(find -- * -name .tfmake -type f -print0)
+
+echo "all:" "${!modules[@]}" > "${WORKDIR}/makefiles/apply/Makefile"
+
+for module in "${!modules[@]}"; do
+    cat >> "${WORKDIR}/makefiles/apply/Makefile" << EOF
+
+${module}: ${modules[${module}]} \$(wildcard ${module}/*.tf)
+	@mkdir -p "${WORKDIR}/logs/apply/${module}"
+	@echo "${module}" >> "${WORKDIR}/outputs/apply/visited"
+
+	terraform -chdir="${module}" init -no-color 2>&1 | tee -a "${WORKDIR}/logs/apply/${module}/init.log"
+	terraform -chdir="${module}" apply -auto-approve -no-color 2>&1 | tee -a "${WORKDIR}/logs/apply/${module}/apply.log"
+EOF
+done

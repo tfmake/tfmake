@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+
+CLASS_DEF_DEFAULT=${CLASS_DEF_DEFAULT:-"fill:#E7F6A4,stroke:#E7F6A4,stroke-width:2px,color:#435200;"}
+CLASS_DEF_VISITED=${CLASS_DEF_VISITED:-"fill:#BACD66,stroke:#435200;"}
+
+function usage() {
+  cat << EOF
+Usage:
+  tfmake mermaid [options]
+
+  This command generate a Mermaid flowchart diagram from Terraform modules and their dependencies.
+
+Options:
+  --help            Show this help output.
+  --plan            Use the outputs from 'tfmake plan'.
+  --apply           Use the outputs from 'tfmake apply'.
+EOF
+  exit
+}
+
+target=""
+option="${1}"
+shift
+
+case "${option}" in
+help|--help)
+  usage
+  ;;
+--plan|--apply)
+  target="${option:2}"
+  ;;
+*) 
+  usage
+  ;;
+esac
+
+if [[ ! -f "${WORKDIR}/outputs/${target}/visited" ]]; then
+    cat << EOF
+Error: file "${WORKDIR}/outputs/${target}/visited" does not exist.
+
+>>> Run 'tfmake ${target}' first."
+EOF
+    exit 1
+fi
+
+cat > "${WORKDIR}/outputs/${target}/mermaid.md" << EOF
+flowchart TB
+
+classDef default ${CLASS_DEF_DEFAULT}
+classDef visited ${CLASS_DEF_VISITED}
+EOF
+
+while IFS= read -r -d '' file; do
+    module=$(dirname "${file}")
+    echo "${module}($module)" >> "${WORKDIR}/outputs/${target}/mermaid.md"
+done <  <(find -- * -name main.tf -type f -print0)
+
+while IFS= read -r -d '' file; do
+    module=$(dirname "${file}")
+    dependencies=$(yq -o=tsv ".dependencies" "${file}")
+
+    for dependency in ${dependencies}; do
+        echo "${dependency}(${dependency}) --> ${module}($module)" >> "${WORKDIR}/outputs/${target}/mermaid.md"
+    done
+done <  <(find -- * -name .tfmake -type f -print0)
+
+if [[ -f ${WORKDIR}/outputs/${target}/visited ]]; then
+    NODES=$(cat "${WORKDIR}/outputs/${target}/visited")
+
+    for node in ${NODES}; do
+        echo "${node}:::visited" >> "${WORKDIR}/outputs/${target}/mermaid.md"
+    done
+fi

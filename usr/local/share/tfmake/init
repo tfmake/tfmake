@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+mkdir -p "${WORKDIR}/outputs"
+mkdir -p "${WORKDIR}/makefiles"

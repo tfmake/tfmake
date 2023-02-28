@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+if [[ ! -f "${WORKDIR}/makefiles/apply/Makefile" ]]; then
+    cat << EOF
+Error: file "${WORKDIR}/makefiles/apply/Makefile" does not exist.
+
+>>> Run 'tfmake makefile --apply' first."
+EOF
+    exit 1
+fi
+
+truncate -s 0 "${WORKDIR}/outputs/apply/nodes"
+truncate -s 0 "${WORKDIR}/outputs/apply/visited"
+
+make -f "${WORKDIR}/makefiles/apply/Makefile"

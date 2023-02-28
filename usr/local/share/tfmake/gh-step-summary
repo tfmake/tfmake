@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+function usage() {
+  cat << EOF
+Usage:
+  tfmake gh-step-summary [options]
+
+  This command add content to GitHub Step Summary.
+
+Options:
+  --help            Show this help output.
+  --plan            Use the outputs from 'tfmake summary --plan'.
+  --apply           Use the outputs from 'tfmake summary --apply'.
+EOF
+  exit
+}
+
+target=""
+option="${1}"
+shift
+
+case "${option}" in
+--help)
+  usage
+  ;;
+--plan|--apply)
+  target="${option:2}"
+  ;;
+*) 
+  usage
+  ;;
+esac
+
+GITHUB_STEP_SUMMARY=${GITHUB_STEP_SUMMARY:-"/dev/null"}
+cat "${WORKDIR}/outputs/${target}/summary.md" >> "${GITHUB_STEP_SUMMARY}"
