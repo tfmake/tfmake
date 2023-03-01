@@ -37,4 +37,4 @@ case "${option}" in
   ;;
 esac
 
-gh pr comment "${NUMBER}" -F "${WORKDIR}/outputs/${target}/summary.md"
+gh pr comment "${NUMBER}" -F "${DATA_DIR}/outputs/${target}/summary.md"

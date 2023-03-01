@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
 readonly BACKTICKS='```'
-readonly SUMMARY="${WORKDIR}/outputs/plan/summary.md"
+readonly SUMMARY="${DATA_DIR}/outputs/plan/summary.md"
 
-if [[ ! -f "${WORKDIR}/outputs/plan/mermaid.md" ]]; then
+if [[ ! -f "${DATA_DIR}/outputs/plan/mermaid.md" ]]; then
     cat << EOF
-Error: file "${WORKDIR}/outputs/plan/mermaid.md" does not exist.
+Error: file "${DATA_DIR}/outputs/plan/mermaid.md" does not exist.
 
 >>> Run 'tfmake mermaid --plan' first."
 EOF
@@ -17,13 +17,13 @@ truncate -s 0 "${SUMMARY}"
 # mermaid
 cat >> "${SUMMARY}" << EOF
 ${BACKTICKS}mermaid
-$(cat "${WORKDIR}/outputs/plan/mermaid.md")
+$(cat "${DATA_DIR}/outputs/plan/mermaid.md")
 ${BACKTICKS}
 EOF
 
 # init and plan logs
-if [[ -f ${WORKDIR}/outputs/plan/visited ]]; then
-    nodes=$(cat "${WORKDIR}/outputs/plan/visited")
+if [[ -f ${DATA_DIR}/outputs/plan/visited ]]; then
+    nodes=$(cat "${DATA_DIR}/outputs/plan/visited")
 
     for node in ${nodes}; do
         cat >> "${SUMMARY}" << EOF
@@ -31,11 +31,11 @@ if [[ -f ${WORKDIR}/outputs/plan/visited ]]; then
 <summary>Module <strong>"${node}"</strong> Plan</summary>
 
 ${BACKTICKS}
-$(cat "${WORKDIR}/logs/plan/${node}/init.log")
+$(cat "${DATA_DIR}/logs/plan/${node}/init.log")
 ${BACKTICKS}
 
 ${BACKTICKS}
-$(cat "${WORKDIR}/logs/plan/${node}/plan.log")
+$(cat "${DATA_DIR}/logs/plan/${node}/plan.log")
 ${BACKTICKS}
 
 </details>	

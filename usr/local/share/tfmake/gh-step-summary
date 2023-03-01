@@ -32,4 +32,4 @@ case "${option}" in
 esac
 
 GITHUB_STEP_SUMMARY=${GITHUB_STEP_SUMMARY:-"/dev/null"}
-cat "${WORKDIR}/outputs/${target}/summary.md" >> "${GITHUB_STEP_SUMMARY}"
+cat "${DATA_DIR}/outputs/${target}/summary.md" >> "${GITHUB_STEP_SUMMARY}"

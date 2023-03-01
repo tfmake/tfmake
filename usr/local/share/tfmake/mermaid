@@ -34,16 +34,16 @@ help|--help)
   ;;
 esac
 
-if [[ ! -f "${WORKDIR}/outputs/${target}/visited" ]]; then
+if [[ ! -f "${DATA_DIR}/outputs/${target}/visited" ]]; then
     cat << EOF
-Error: file "${WORKDIR}/outputs/${target}/visited" does not exist.
+Error: file "${DATA_DIR}/outputs/${target}/visited" does not exist.
 
 >>> Run 'tfmake ${target}' first."
 EOF
     exit 1
 fi
 
-cat > "${WORKDIR}/outputs/${target}/mermaid.md" << EOF
+cat > "${DATA_DIR}/outputs/${target}/mermaid.md" << EOF
 flowchart TB
 
 classDef default ${CLASS_DEF_DEFAULT}
@@ -52,7 +52,7 @@ EOF
 
 while IFS= read -r -d '' file; do
     module=$(dirname "${file}")
-    echo "${module}($module)" >> "${WORKDIR}/outputs/${target}/mermaid.md"
+    echo "${module}($module)" >> "${DATA_DIR}/outputs/${target}/mermaid.md"
 done <  <(find -- * -name main.tf -type f -print0)
 
 while IFS= read -r -d '' file; do
@@ -60,14 +60,14 @@ while IFS= read -r -d '' file; do
     dependencies=$(yq -o=tsv ".dependencies" "${file}")
 
     for dependency in ${dependencies}; do
-        echo "${dependency}(${dependency}) --> ${module}($module)" >> "${WORKDIR}/outputs/${target}/mermaid.md"
+        echo "${dependency}(${dependency}) --> ${module}($module)" >> "${DATA_DIR}/outputs/${target}/mermaid.md"
     done
 done <  <(find -- * -name .tfmake -type f -print0)
 
-if [[ -f ${WORKDIR}/outputs/${target}/visited ]]; then
-    NODES=$(cat "${WORKDIR}/outputs/${target}/visited")
+if [[ -f ${DATA_DIR}/outputs/${target}/visited ]]; then
+    NODES=$(cat "${DATA_DIR}/outputs/${target}/visited")
 
     for node in ${NODES}; do
-        echo "${node}:::visited" >> "${WORKDIR}/outputs/${target}/mermaid.md"
+        echo "${node}:::visited" >> "${DATA_DIR}/outputs/${target}/mermaid.md"
     done
 fi

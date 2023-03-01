@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
 readonly BACKTICKS='```'
-readonly SUMMARY="${WORKDIR}/outputs/apply/summary.md"
+readonly SUMMARY="${DATA_DIR}/outputs/apply/summary.md"
 
-if [[ ! -f "${WORKDIR}/outputs/apply/mermaid.md" ]]; then
+if [[ ! -f "${DATA_DIR}/outputs/apply/mermaid.md" ]]; then
     cat << EOF
-Error: file "${WORKDIR}/outputs/apply/mermaid.md" does not exist.
+Error: file "${DATA_DIR}/outputs/apply/mermaid.md" does not exist.
 
 >>> Run 'tfmake mermaid --apply' first."
 EOF
@@ -17,13 +17,13 @@ truncate -s 0 "${SUMMARY}"
 # mermaid
 cat >> "${SUMMARY}" << EOF
 ${BACKTICKS}mermaid
-$(cat "${WORKDIR}/outputs/apply/mermaid.md")
+$(cat "${DATA_DIR}/outputs/apply/mermaid.md")
 ${BACKTICKS}
 EOF
 
 # init and apply logs
-if [[ -f ${WORKDIR}/outputs/apply/visited ]]; then
-    nodes=$(cat "${WORKDIR}/outputs/apply/visited")
+if [[ -f ${DATA_DIR}/outputs/apply/visited ]]; then
+    nodes=$(cat "${DATA_DIR}/outputs/apply/visited")
 
     for node in ${nodes}; do
         cat >> "${SUMMARY}" << EOF
@@ -31,11 +31,11 @@ if [[ -f ${WORKDIR}/outputs/apply/visited ]]; then
 <summary>Module <strong>"${node}"</strong> Apply</summary>
 
 ${BACKTICKS}
-$(cat "${WORKDIR}/logs/apply/${node}/init.log")
+$(cat "${DATA_DIR}/logs/apply/${node}/init.log")
 ${BACKTICKS}
 
 ${BACKTICKS}
-$(cat "${WORKDIR}/logs/apply/${node}/apply.log")
+$(cat "${DATA_DIR}/logs/apply/${node}/apply.log")
 ${BACKTICKS}
 
 </details>	
