@@ -60,7 +60,7 @@ while IFS= read -r -d '' file; do
     dependencies=$(yq -o=tsv ".dependencies" "${file}")
 
     for dependency in ${dependencies}; do
-        echo "${dependency}(${dependency}) --> ${module}($module)" >> "${DATA_DIR}/outputs/${target}/mermaid.md"
+        echo "${dependency} --> ${module}" >> "${DATA_DIR}/outputs/${target}/mermaid.md"
     done
 done <  <(find -- * -name .tfmake -type f -print0)
 
