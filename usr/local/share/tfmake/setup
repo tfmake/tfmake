@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
 
+# shellcheck source=/dev/null
+source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
+
 sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
 sudo chmod +x /usr/bin/yq

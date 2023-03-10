@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# shellcheck source=/dev/null
+source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
+
 function usage() {
   cat << EOF
 Usage:
@@ -32,9 +35,9 @@ case "${option}" in
     shift
   fi
   ;;
-*) 
+*)
   usage
   ;;
 esac
 
-gh pr comment "${NUMBER}" -F "${DATA_DIR}/outputs/${target}/summary.md"
+gh pr comment "${NUMBER}" -F "${DATA_DIR}/${target}/outputs/summary.md"

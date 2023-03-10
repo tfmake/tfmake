@@ -1,44 +1,45 @@
 #!/usr/bin/env bash
 
-readonly BACKTICKS='```'
-readonly SUMMARY="${DATA_DIR}/outputs/apply/summary.md"
+# shellcheck source=/dev/null
+source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
+source "${SCRIPT_DIR}/../include/tfmake/store.sh"
 
-if [[ ! -f "${DATA_DIR}/outputs/apply/mermaid.md" ]]; then
-    cat << EOF
-Error: file "${DATA_DIR}/outputs/apply/mermaid.md" does not exist.
+BACKTICKS='```'
+MERMAID_FILE="${DATA_DIR}/apply/outputs/mermaid.md"
+SUMMARY_FILE="${DATA_DIR}/apply/outputs/summary.md"
 
->>> Run 'tfmake mermaid --apply' first."
-EOF
-    exit 1
-fi
+file::exist_condition  \
+  "${MERMAID_FILE}" \
+  "tfmake mermaid --apply"
 
-truncate -s 0 "${SUMMARY}"
+truncate -s 0 "${SUMMARY_FILE}"
 
 # mermaid
-cat >> "${SUMMARY}" << EOF
+cat >> "${SUMMARY_FILE}" << EOF
 ${BACKTICKS}mermaid
-$(cat "${DATA_DIR}/outputs/apply/mermaid.md")
+$(cat "${MERMAID_FILE}")
 ${BACKTICKS}
 EOF
 
-# init and apply logs
-if [[ -f ${DATA_DIR}/outputs/apply/visited ]]; then
-    nodes=$(cat "${DATA_DIR}/outputs/apply/visited")
+file::new_line "${SUMMARY_FILE}"
 
-    for node in ${nodes}; do
-        cat >> "${SUMMARY}" << EOF
+# logs
+store::basepath "${DATA_DIR}/apply/store"
+nodes=$(kv::keys visited)
+
+for node in ${nodes}; do
+  cat >> "${SUMMARY_FILE}" << EOF
 <details>
 <summary>Module <strong>"${node}"</strong> Apply</summary>
 
 ${BACKTICKS}
-$(cat "${DATA_DIR}/logs/apply/${node}/init.log")
+$(cat "${DATA_DIR}/apply/logs/${node}/init.log")
 ${BACKTICKS}
 
 ${BACKTICKS}
-$(cat "${DATA_DIR}/logs/apply/${node}/apply.log")
+$(cat "${DATA_DIR}/apply/logs/${node}/apply.log")
 ${BACKTICKS}
 
-</details>	
+</details>
 EOF
-    done
-fi
+done

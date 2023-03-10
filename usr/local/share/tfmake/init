@@ -1,4 +1,57 @@
 #!/usr/bin/env bash
 
-mkdir -p "${DATA_DIR}/outputs"
-mkdir -p "${DATA_DIR}/makefiles"
+# shellcheck source=/dev/null
+source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
+source "${SCRIPT_DIR}/../include/tfmake/store.sh"
+
+function usage() {
+  cat << EOF
+Usage:
+  tfmake init [options]
+
+  This command initialize the data directory for Terraform plan or apply execution.
+
+Options:
+  --help            Show this help output.
+  --plan            Initialize the data directory for 'terraform plan' execution.
+  --apply           Initialize the data directory for 'terraform aply' execution.
+EOF
+  exit
+}
+
+target=""
+option="${1}"
+shift
+
+case "${option}" in
+help|--help)
+  usage
+  ;;
+--plan|--apply)
+  target="${option:2}"
+  ;;
+*)
+  usage
+  ;;
+esac
+
+mkdir -p "${DATA_DIR}/${target}/logs"
+mkdir -p "${DATA_DIR}/${target}/outputs"
+mkdir -p "${DATA_DIR}/${target}/store"
+
+store::basepath "${DATA_DIR}/${target}/store"
+
+store::kv modules
+while IFS= read -r -d '' file; do
+  kv::set "$(dirname "${file}")" true
+done <  <(find -- * -name main.tf -type f -print0)
+
+store::kv dependencies
+while IFS= read -r -d '' file; do
+  module=$(dirname "${file}")
+
+  deps=$(yq -o=csv ".dependencies" "${file}")
+  if [[ -n ${deps} ]]; then
+    kv::set "${module}" "${deps}"
+  fi
+done <  <(find -- * -name .tfmake -type f -print0)

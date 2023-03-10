@@ -5,23 +5,20 @@ set -Eeuo pipefail
 VERSION="0.1.0"
 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
-DATA_DIR="${DATA_DIR:-".tfmake/data"}"
-
 export SCRIPT_DIR
-export DATA_DIR
 
 function usage() {
   cat << EOF
-Usage: 
+Usage:
   tfmake command [options] [args]
 
 Available Commands:
   apply             Execute the apply Makefile.
-  cleanup           Cleanup work directory. 
+  cleanup           Cleanup the data directory.
   gh-pr-comment     Add a comment to a GitHub pull request.
   gh-step-summary   Add content to GitHub Step Summary.
-  init              Initialize work directory.
-  makefile          Generate a Makefile from Terraform modules and their dependencies.
+  init              Initialize the data directory for Terraform plan or apply execution.
+  makefile          Generate a Makefile for Terraform plan or apply execution.
   mermaid           Generate a Mermaid flowchart diagram from Terraform modules and their dependencies.
   plan              Execute the plan Makefile.
   setup             Install dependencies.
@@ -49,7 +46,7 @@ case "${CMD}" in
   echo "${VERSION}"
   exit
   ;;
-apply|cleanup|init|plan|setup|touch)
+apply|cleanup|plan|setup|touch)
   ;;
 makefile|summary)
   tmp="${CMD}-help"
@@ -61,7 +58,7 @@ makefile|summary)
 
   CMD="${tmp}"
   ;;
-gh-pr-comment|gh-step-summary|mermaid)
+gh-pr-comment|gh-step-summary|init|mermaid)
   OPTIONS="--help"
 
   if [[ $# -gt 0 ]] && [[ "${1}" == "--help" || "${1}" == "--plan" || "${1}" == "--apply" ]]; then
@@ -69,7 +66,7 @@ gh-pr-comment|gh-step-summary|mermaid)
     shift
   fi
   ;;
-*) 
+*)
   usage
   ;;
 esac
@@ -77,7 +74,7 @@ esac
 SCRIPT_PATH="${SCRIPT_DIR}/../share/tfmake/${CMD}"
 
 if [[ -n "${OPTIONS}" ]]; then
-    exec "bash" "${SCRIPT_PATH}" "${OPTIONS}" "$@"
+  exec "bash" "${SCRIPT_PATH}" "${OPTIONS}" "$@"
 else
-    exec "bash" "${SCRIPT_PATH}" "$@"
+  exec "bash" "${SCRIPT_PATH}" "$@"
 fi

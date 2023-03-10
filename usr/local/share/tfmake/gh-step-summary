@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# shellcheck source=/dev/null
+source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
+
 function usage() {
   cat << EOF
 Usage:
@@ -26,10 +29,10 @@ case "${option}" in
 --plan|--apply)
   target="${option:2}"
   ;;
-*) 
+*)
   usage
   ;;
 esac
 
 GITHUB_STEP_SUMMARY=${GITHUB_STEP_SUMMARY:-"/dev/null"}
-cat "${DATA_DIR}/outputs/${target}/summary.md" >> "${GITHUB_STEP_SUMMARY}"
+cat "${DATA_DIR}/${target}/outputs/summary.md" >> "${GITHUB_STEP_SUMMARY}"

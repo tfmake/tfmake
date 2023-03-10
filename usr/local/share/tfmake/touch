@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-FILES=${1}
+# shellcheck source=/dev/null
+source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
 
-for file in ${FILES}; do
-    echo "touch file: ${file}"
-    touch "${file}"
+files=${1}
+for file in ${files}; do
+  touch "${file}"
 done

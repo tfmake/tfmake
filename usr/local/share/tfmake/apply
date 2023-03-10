@@ -1,15 +1,26 @@
 #!/usr/bin/env bash
 
-if [[ ! -f "${DATA_DIR}/makefiles/apply/Makefile" ]]; then
-    cat << EOF
-Error: file "${DATA_DIR}/makefiles/apply/Makefile" does not exist.
+# shellcheck source=/dev/null
+source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
+source "${SCRIPT_DIR}/../include/tfmake/store.sh"
 
->>> Run 'tfmake makefile --apply' first."
-EOF
-    exit 1
+file::exist_condition  \
+  "${DATA_DIR}/apply/Makefile" \
+  "tfmake makefile --apply"
+
+truncate -s 0 "${DATA_DIR}/apply/outputs/visited"
+
+export TF_IN_AUTOMATION=true
+make -f "${DATA_DIR}/apply/Makefile"
+
+store::basepath "${DATA_DIR}/apply/store"
+store::kv visited
+
+if [[ -f "${DATA_DIR}/apply/outputs/visited" ]]; then
+  nodes=$(cat "${DATA_DIR}/apply/outputs/visited")
+  for node in ${nodes}; do
+    kv::set "${node}" true
+  done
 fi
 
-truncate -s 0 "${DATA_DIR}/outputs/apply/nodes"
-truncate -s 0 "${DATA_DIR}/outputs/apply/visited"
-
-make -f "${DATA_DIR}/makefiles/apply/Makefile"
+rm -f "${DATA_DIR}/apply/outputs/visited"

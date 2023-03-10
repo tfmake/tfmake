@@ -1,32 +1,32 @@
 #!/usr/bin/env bash
 
-declare -A modules=()
+# shellcheck source=/dev/null
+source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
+source "${SCRIPT_DIR}/../include/tfmake/store.sh"
 
-mkdir -p "${DATA_DIR}/outputs/apply"
-mkdir -p "${DATA_DIR}/makefiles/apply"
+file::exist_condition  \
+  "${DATA_DIR}/apply/store/dependencies/keys" \
+  "tfmake init --apply"
 
-while IFS= read -r -d '' file; do
-    module=$(dirname "${file}")
-    modules["${module}"]=""
+store::basepath "${DATA_DIR}/apply/store"
 
-    echo "${module}" >> "${DATA_DIR}/outputs/apply/nodes"
-done <  <(find -- * -name main.tf -type f -print0)
+modules=$(kv::keys modules)
 
-while IFS= read -r -d '' file; do
-    module=$(dirname "${file}")
-    modules["${module}"]=$(yq -o=tsv ".dependencies" "${file}")
-done <  <(find -- * -name .tfmake -type f -print0)
+cat > "${DATA_DIR}/apply/Makefile" << EOF
+all: $(utils::splitlines "${modules}")
+EOF
 
-echo "all:" "${!modules[@]}" > "${DATA_DIR}/makefiles/apply/Makefile"
+for module in ${modules}; do
+  deps=$(kv::get dependencies "${module}")
+  [[ -n ${deps} ]] && deps=${deps//,/ }
 
-for module in "${!modules[@]}"; do
-    cat >> "${DATA_DIR}/makefiles/apply/Makefile" << EOF
+  file::new_line "${DATA_DIR}/apply/Makefile"
 
-${module}: ${modules[${module}]} \$(wildcard ${module}/*.tf)
-	@mkdir -p "${DATA_DIR}/logs/apply/${module}"
-	@echo "${module}" >> "${DATA_DIR}/outputs/apply/visited"
-
-	terraform -chdir="${module}" init -no-color 2>&1 | tee -a "${DATA_DIR}/logs/apply/${module}/init.log"
-	terraform -chdir="${module}" apply -auto-approve -no-color 2>&1 | tee -a "${DATA_DIR}/logs/apply/${module}/apply.log"
+  cat >> "${DATA_DIR}/apply/Makefile" << EOF
+${module}: \$(wildcard ${module}/*.tf) ${deps}
+${TAB}@mkdir -p "${DATA_DIR}/apply/logs/${module}"
+${TAB}@echo "${module}" >> "${DATA_DIR}/apply/outputs/visited"
+${TAB}terraform -chdir="${module}" init -no-color 2>&1 | tee -a "${DATA_DIR}/apply/logs/${module}/init.log"
+${TAB}terraform -chdir="${module}" apply -auto-approve -no-color 2>&1 | tee -a "${DATA_DIR}/apply/logs/${module}/apply.log"
 EOF
 done

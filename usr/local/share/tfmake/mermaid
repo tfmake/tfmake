@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# shellcheck source=/dev/null
+source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
+source "${SCRIPT_DIR}/../include/tfmake/store.sh"
+
 CLASS_DEF_DEFAULT=${CLASS_DEF_DEFAULT:-"fill:#E7F6A4,stroke:#E7F6A4,stroke-width:2px,color:#435200;"}
 CLASS_DEF_VISITED=${CLASS_DEF_VISITED:-"fill:#BACD66,stroke:#435200;"}
 
@@ -8,7 +12,7 @@ function usage() {
 Usage:
   tfmake mermaid [options]
 
-  This command generate a Mermaid flowchart diagram from Terraform modules and their dependencies.
+  This command generate a Mermaid flowchart diagram from modules and their dependencies.
 
 Options:
   --help            Show this help output.
@@ -29,45 +33,46 @@ help|--help)
 --plan|--apply)
   target="${option:2}"
   ;;
-*) 
+*)
   usage
   ;;
 esac
 
-if [[ ! -f "${DATA_DIR}/outputs/${target}/visited" ]]; then
-    cat << EOF
-Error: file "${DATA_DIR}/outputs/${target}/visited" does not exist.
+file::exist_condition  \
+  "${DATA_DIR}/${target}/store/visited/keys" \
+  "tfmake ${target}"
 
->>> Run 'tfmake ${target}' first."
-EOF
-    exit 1
-fi
+MERMAID_FILE="${DATA_DIR}/${target}/outputs/mermaid.md"
 
-cat > "${DATA_DIR}/outputs/${target}/mermaid.md" << EOF
+cat > "${MERMAID_FILE}" << EOF
 flowchart TB
 
 classDef default ${CLASS_DEF_DEFAULT}
 classDef visited ${CLASS_DEF_VISITED}
 EOF
 
-while IFS= read -r -d '' file; do
-    module=$(dirname "${file}")
-    echo "${module}($module)" >> "${DATA_DIR}/outputs/${target}/mermaid.md"
-done <  <(find -- * -name main.tf -type f -print0)
+file::new_line "${MERMAID_FILE}"
 
-while IFS= read -r -d '' file; do
-    module=$(dirname "${file}")
-    dependencies=$(yq -o=tsv ".dependencies" "${file}")
+store::basepath "${DATA_DIR}/${target}/store"
 
-    for dependency in ${dependencies}; do
-        echo "${dependency} --> ${module}" >> "${DATA_DIR}/outputs/${target}/mermaid.md"
-    done
-done <  <(find -- * -name .tfmake -type f -print0)
+modules=$(kv::keys modules)
+for module in ${modules}; do
+  echo "${module}($module)" >> "${MERMAID_FILE}"
 
-if [[ -f ${DATA_DIR}/outputs/${target}/visited ]]; then
-    NODES=$(cat "${DATA_DIR}/outputs/${target}/visited")
+  deps=$(kv::get dependencies "${module}")
 
-    for node in ${NODES}; do
-        echo "${node}:::visited" >> "${DATA_DIR}/outputs/${target}/mermaid.md"
-    done
-fi
+  if [[ -n ${deps} ]]; then
+    deps=${deps//,/ }
+  fi
+
+  for dep in ${deps}; do
+    echo "${dep} --> ${module}" >> "${MERMAID_FILE}"
+  done
+done
+
+file::new_line "${MERMAID_FILE}"
+
+nodes=$(kv::keys visited)
+for node in ${nodes}; do
+  echo "${node}:::visited" >> "${MERMAID_FILE}"
+done

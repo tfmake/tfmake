@@ -1,17 +1,16 @@
 # tfmake
 
 ```
-tfmake
 Usage:
   tfmake command [options] [args]
 
 Available Commands:
   apply             Execute the apply Makefile.
-  cleanup           Cleanup work directory.
+  cleanup           Cleanup the data directory.
   gh-pr-comment     Add a comment to a GitHub pull request.
   gh-step-summary   Add content to GitHub Step Summary.
-  init              Initialize work directory.
-  makefile          Generate a Makefile from Terraform modules and their dependencies.
+  init              Initialize the data directory for Terraform plan or apply execution.
+  makefile          Generate a Makefile for Terraform plan or apply execution.
   mermaid           Generate a Mermaid flowchart diagram from Terraform modules and their dependencies.
   plan              Execute the plan Makefile.
   setup             Install dependencies.
