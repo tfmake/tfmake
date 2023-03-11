@@ -23,7 +23,7 @@ Available Commands:
   plan              Execute the plan Makefile.
   setup             Install dependencies.
   summary           Create a Markdown summary.
-  touch             Touch modify files.
+  touch             Touch modified files.
 
 Other options:
   -h, --help        Print this help and exit.
