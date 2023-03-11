@@ -95,3 +95,9 @@ setup() {
 
   assert_file_exist ".tfmake/plan/outputs/summary.md"
 }
+
+@test "tfmake summary (title)" {
+  export SUMMARY_TITLE="Basic Project Plan"
+  bash tfmake summary --plan
+  assert_file_contains ".tfmake/plan/outputs/summary.md" "${SUMMARY_TITLE}"
+}

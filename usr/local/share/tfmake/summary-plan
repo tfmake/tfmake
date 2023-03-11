@@ -7,12 +7,20 @@ source "${SCRIPT_DIR}/../include/tfmake/store.sh"
 BACKTICKS='```'
 MERMAID_FILE="${DATA_DIR}/plan/outputs/mermaid.md"
 SUMMARY_FILE="${DATA_DIR}/plan/outputs/summary.md"
+SUMMARY_TITLE="${SUMMARY_TITLE:-""}"
 
 file::exist_condition  \
   "${MERMAID_FILE}" \
   "tfmake mermaid --plan"
 
 truncate -s 0 "${SUMMARY_FILE}"
+
+# title
+if [[ -n "${SUMMARY_TITLE}" ]]; then
+  echo "### ${SUMMARY_TITLE}" > "${SUMMARY_FILE}"
+fi
+
+file::new_line "${SUMMARY_FILE}"
 
 # mermaid
 cat >> "${SUMMARY_FILE}" << EOF
