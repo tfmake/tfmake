@@ -55,3 +55,15 @@ while IFS= read -r -d '' file; do
     kv::set "${module}" "${deps}"
   fi
 done <  <(find -- * -name .tfmake -type f -print0)
+
+modules="$(utils::splitlines "$(kv::keys modules)")"
+
+# shellcheck disable=SC2086
+
+# Changing only the modification time with '-m' ensure that the same time is used
+# for all directories. Otherwise NULL is passed to 'utimensat',
+# setting the current time for each one.
+touch -c -m ${modules}
+
+# Ensure that the call to 'tfmake touch ${FILES}' will not use the same time.
+sleep 1
