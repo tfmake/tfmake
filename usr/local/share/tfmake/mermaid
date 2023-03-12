@@ -38,7 +38,7 @@ help|--help)
   ;;
 esac
 
-file::exist_condition  \
+file::exist_condition \
   "${DATA_DIR}/${target}/store/visited/keys" \
   "tfmake ${target}"
 

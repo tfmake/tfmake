@@ -4,7 +4,7 @@
 source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
 source "${SCRIPT_DIR}/../include/tfmake/store.sh"
 
-file::exist_condition  \
+file::exist_condition \
   "${DATA_DIR}/apply/Makefile" \
   "tfmake makefile --apply"
 
