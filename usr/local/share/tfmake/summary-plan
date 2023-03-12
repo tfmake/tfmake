@@ -9,7 +9,7 @@ MERMAID_FILE="${DATA_DIR}/plan/outputs/mermaid.md"
 SUMMARY_FILE="${DATA_DIR}/plan/outputs/summary.md"
 SUMMARY_TITLE="${SUMMARY_TITLE:-""}"
 
-file::exist_condition  \
+file::exist_condition \
   "${MERMAID_FILE}" \
   "tfmake mermaid --plan"
 
@@ -42,9 +42,9 @@ for node in ${nodes}; do
 
 ${BACKTICKS}
 $(cat "${DATA_DIR}/plan/logs/${node}/init.log")
-${BACKTICKS}
 
-${BACKTICKS}
+--------------------------------------------------------------------------------
+
 $(cat "${DATA_DIR}/plan/logs/${node}/plan.log")
 ${BACKTICKS}
 
