@@ -4,7 +4,7 @@
 source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
 source "${SCRIPT_DIR}/../include/tfmake/store.sh"
 
-file::exist_condition  \
+file::exist_condition \
   "${DATA_DIR}/plan/store/dependencies/keys" \
   "tfmake init --plan"
 
@@ -26,7 +26,7 @@ for module in ${modules}; do
 ${module}: \$(wildcard ${module}/*.tf) ${deps}
 ${TAB}@mkdir -p "${DATA_DIR}/plan/logs/${module}"
 ${TAB}@echo "${module}" >> "${DATA_DIR}/plan/outputs/visited"
-${TAB}terraform -chdir="${module}" init -no-color 2>&1 | tee -a "${DATA_DIR}/plan/logs/${module}/init.log"
-${TAB}terraform -chdir="${module}" plan -out output.plan -no-color 2>&1 | tee -a "${DATA_DIR}/plan/logs/${module}/plan.log"
+${TAB}terraform -chdir="${module}" init -no-color 2>&1 | tee "${DATA_DIR}/plan/logs/${module}/init.log"
+${TAB}terraform -chdir="${module}" plan -no-color 2>&1 | tee "${DATA_DIR}/plan/logs/${module}/plan.log"
 EOF
 done
