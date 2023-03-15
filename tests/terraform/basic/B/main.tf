@@ -1,6 +1,6 @@
 resource "random_id" "id" {
   keepers = {
-    content = "B"
+    content = var.content
   }
 
   byte_length = 8
