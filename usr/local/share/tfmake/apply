@@ -11,7 +11,7 @@ file::exist_condition \
 truncate -s 0 "${DATA_DIR}/apply/outputs/visited"
 
 export TF_IN_AUTOMATION=true
-make -f "${DATA_DIR}/apply/Makefile"
+make -i -f "${DATA_DIR}/apply/Makefile"
 
 store::basepath "${DATA_DIR}/apply/store"
 store::kv visited
