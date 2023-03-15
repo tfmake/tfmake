@@ -23,7 +23,7 @@ for module in ${modules}; do
   file::new_line "${DATA_DIR}/apply/Makefile"
 
   cat >> "${DATA_DIR}/apply/Makefile" << EOF
-${module}: \$(wildcard ${module}/*.tf) ${deps}
+${module}: \$(wildcard ${module}/*.tf ${module}/*.tfvars) ${deps}
 ${TAB}@mkdir -p "${DATA_DIR}/apply/logs/${module}"
 ${TAB}@echo "${module}" >> "${DATA_DIR}/apply/outputs/visited"
 ${TAB}terraform -chdir="${module}" init -no-color 2>&1 | tee "${DATA_DIR}/apply/logs/${module}/init.log"
