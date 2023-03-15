@@ -13,6 +13,8 @@ store::basepath "${DATA_DIR}/apply/store"
 modules=$(kv::keys modules)
 
 cat > "${DATA_DIR}/apply/Makefile" << EOF
+SHELL=$(which bash) -o pipefail
+
 all: $(utils::splitlines "${modules}")
 EOF
 
