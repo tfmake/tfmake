@@ -24,10 +24,11 @@ Available Commands:
   setup             Install dependencies.
   summary           Create a Markdown summary.
   touch             Touch modified files.
+  version           Show the current version.
 
 Other options:
   -h, --help        Print this help and exit.
-  --version         Show the current version.
+  -v, --version     An alias for the "version" subcommand.
 EOF
   exit
 }
@@ -42,8 +43,8 @@ case "${CMD}" in
 -h | --help)
   usage
   ;;
---version)
-  echo "${VERSION}"
+-v | --version | version)
+  echo "tfmake v${VERSION}"
   exit
   ;;
 apply|cleanup|plan|setup|touch)
