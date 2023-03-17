@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 
+set -u
+
 # shellcheck source=/dev/null
-source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
+{
+  source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
+  source "${SCRIPT_DIR}/../include/tfmake/store.sh"
+}
 
 function usage() {
   cat << EOF
@@ -11,7 +16,7 @@ Usage:
   This command add a comment to a GitHub pull request.
 
 Options:
-  --help            Show this help output.
+  -h, --help        Show this help output.
   --plan            Use the outputs from 'tfmake summary --plan'.
   --apply           Use the outputs from 'tfmake summary --apply'.
 EOF
@@ -19,11 +24,11 @@ EOF
 }
 
 target=""
-option="${1}"
+option="${1-}"
 shift
 
 case "${option}" in
---help)
+-h|--help)
   usage
   ;;
 --plan|--apply)
@@ -31,7 +36,7 @@ case "${option}" in
   if [[ $# -eq 0 ]]; then
     usage
   else
-    NUMBER="${1}"
+    NUMBER="${1-}"
     shift
   fi
   ;;

@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 
+set -u
+
+tab=$(printf '\t')
+
 # shellcheck source=/dev/null
-source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
-source "${SCRIPT_DIR}/../include/tfmake/store.sh"
+{
+  source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
+  source "${SCRIPT_DIR}/../include/tfmake/store.sh"
+}
 
 file::exist_condition \
   "${DATA_DIR}/plan/store/dependencies/keys" \
@@ -26,9 +32,9 @@ for module in ${modules}; do
 
   cat >> "${DATA_DIR}/plan/Makefile" << EOF
 ${module}: \$(wildcard ${module}/*.tf ${module}/*.tfvars) ${deps}
-${TAB}@mkdir -p "${DATA_DIR}/plan/logs/${module}"
-${TAB}@echo "${module}" >> "${DATA_DIR}/plan/outputs/visited"
-${TAB}terraform -chdir="${module}" init -no-color 2>&1 | tee "${DATA_DIR}/plan/logs/${module}/init.log"
-${TAB}terraform -chdir="${module}" plan -no-color 2>&1 | tee "${DATA_DIR}/plan/logs/${module}/plan.log"
+${tab}@mkdir -p "${DATA_DIR}/plan/logs/${module}"
+${tab}@echo "${module}" >> "${DATA_DIR}/plan/outputs/visited"
+${tab}terraform -chdir="${module}" init -no-color 2>&1 | tee "${DATA_DIR}/plan/logs/${module}/init.log"
+${tab}terraform -chdir="${module}" plan -no-color 2>&1 | tee "${DATA_DIR}/plan/logs/${module}/plan.log"
 EOF
 done

@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 
+set -u
+
 # shellcheck source=/dev/null
-source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
+{
+  source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
+  source "${SCRIPT_DIR}/../include/tfmake/store.sh"
+}
 
 rm -rf "${DATA_DIR}"

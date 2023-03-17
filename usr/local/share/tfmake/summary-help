@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-# shellcheck source=/dev/null
-source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
-
 function usage() {
   cat << EOF
 Usage:
@@ -11,7 +8,7 @@ Usage:
   This command create a Markdown summary.
 
 Options:
-  --help            Show this help output.
+  -h, --help        Show this help output.
   --plan            Use Mermaid diagram and outputs from 'tfmake plan'.
   --apply           Use Mermaid diagram and outputs from 'tfmake apply'.
 EOF

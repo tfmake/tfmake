@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 
+set -u
+
 # shellcheck source=/dev/null
-source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
-source "${SCRIPT_DIR}/../include/tfmake/store.sh"
+{
+  source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
+  source "${SCRIPT_DIR}/../include/tfmake/store.sh"
+}
 
 BACKTICKS='```'
 MERMAID_FILE="${DATA_DIR}/apply/outputs/mermaid.md"

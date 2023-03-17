@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 
+set -u
+
+tab=$(printf '\t')
+
 # shellcheck source=/dev/null
-source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
-source "${SCRIPT_DIR}/../include/tfmake/store.sh"
+{
+  source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
+  source "${SCRIPT_DIR}/../include/tfmake/store.sh"
+}
 
 file::exist_condition \
   "${DATA_DIR}/apply/store/dependencies/keys" \
@@ -26,9 +32,9 @@ for module in ${modules}; do
 
   cat >> "${DATA_DIR}/apply/Makefile" << EOF
 ${module}: \$(wildcard ${module}/*.tf ${module}/*.tfvars) ${deps}
-${TAB}@mkdir -p "${DATA_DIR}/apply/logs/${module}"
-${TAB}@echo "${module}" >> "${DATA_DIR}/apply/outputs/visited"
-${TAB}terraform -chdir="${module}" init -no-color 2>&1 | tee "${DATA_DIR}/apply/logs/${module}/init.log"
-${TAB}terraform -chdir="${module}" apply -auto-approve -no-color 2>&1 | tee "${DATA_DIR}/apply/logs/${module}/apply.log"
+${tab}@mkdir -p "${DATA_DIR}/apply/logs/${module}"
+${tab}@echo "${module}" >> "${DATA_DIR}/apply/outputs/visited"
+${tab}terraform -chdir="${module}" init -no-color 2>&1 | tee "${DATA_DIR}/apply/logs/${module}/init.log"
+${tab}terraform -chdir="${module}" apply -auto-approve -no-color 2>&1 | tee "${DATA_DIR}/apply/logs/${module}/apply.log"
 EOF
 done

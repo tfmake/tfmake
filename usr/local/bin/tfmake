@@ -34,37 +34,28 @@ EOF
 
 [[ $# -eq 0 ]] && usage
 
-OPTIONS=""
-CMD="${1}"
+CMD="${1-}"
 shift
 
 case "${CMD}" in
--h | --help)
+-h|--help)
   usage
   ;;
--v | --version | version)
+-v|--version|version)
   echo "tfmake v${VERSION}"
   exit
   ;;
-apply|cleanup|plan|touch)
+apply|cleanup|gh-pr-comment|gh-step-summary|mermaid|init|plan|touch)
   ;;
 makefile|summary)
   tmp="${CMD}-help"
 
-  if [[ $# -gt 0 ]] && [[ "${1}" == "--help" || "${1}" == "--plan" || "${1}" == "--apply" ]]; then
+  if [[ "${1-}" == "--plan" || "${1-}" == "--apply" ]]; then
     tmp="${CMD}-${1:2}"
     shift
   fi
 
   CMD="${tmp}"
-  ;;
-gh-pr-comment|gh-step-summary|init|mermaid)
-  OPTIONS="--help"
-
-  if [[ $# -gt 0 ]] && [[ "${1}" == "--help" || "${1}" == "--plan" || "${1}" == "--apply" ]]; then
-    OPTIONS="${1}"
-    shift
-  fi
   ;;
 *)
   usage
@@ -73,8 +64,4 @@ esac
 
 SCRIPT_PATH="${SCRIPT_DIR}/../share/tfmake/${CMD}"
 
-if [[ -n "${OPTIONS}" ]]; then
-  exec "bash" "${SCRIPT_PATH}" "${OPTIONS}" "$@"
-else
-  exec "bash" "${SCRIPT_PATH}" "$@"
-fi
+exec "bash" "${SCRIPT_PATH}" "$@"

@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 
+set -u
+
 # shellcheck source=/dev/null
-source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
-source "${SCRIPT_DIR}/../include/tfmake/store.sh"
+{
+  source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
+  source "${SCRIPT_DIR}/../include/tfmake/store.sh"
+}
 
 function usage() {
   cat << EOF
@@ -12,7 +16,7 @@ Usage:
   This command initialize the data directory for Terraform plan or apply execution.
 
 Options:
-  --help            Show this help output.
+  -h, --help        Show this help output.
   --plan            Initialize the data directory for 'terraform plan' execution.
   --apply           Initialize the data directory for 'terraform aply' execution.
 EOF
@@ -20,11 +24,11 @@ EOF
 }
 
 target=""
-option="${1}"
+option="${1-}"
 shift
 
 case "${option}" in
-help|--help)
+-h|--help)
   usage
   ;;
 --plan|--apply)
@@ -62,7 +66,7 @@ modules="$(utils::splitlines "$(kv::keys modules)")"
 
 # Changing only the modification time with '-m' ensure that the same time is used
 # for all directories. Otherwise NULL is passed to 'utimensat',
-# setting the current time for each one.
+# setting UTIME_NOW for each one.
 touch -c -m ${modules}
 
 # Ensure that the call to 'tfmake touch ${FILES}' will not use the same time.

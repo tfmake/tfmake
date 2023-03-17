@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 
+set -u
+
 # shellcheck source=/dev/null
-source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
-source "${SCRIPT_DIR}/../include/tfmake/store.sh"
+{
+  source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
+  source "${SCRIPT_DIR}/../include/tfmake/store.sh"
+}
 
 CLASS_DEF_DEFAULT=${CLASS_DEF_DEFAULT:-"fill:#E7F6A4,stroke:#E7F6A4,stroke-width:2px,color:#435200;"}
 CLASS_DEF_VISITED=${CLASS_DEF_VISITED:-"fill:#BACD66,stroke:#435200;"}
@@ -15,7 +19,7 @@ Usage:
   This command generate a Mermaid flowchart diagram from modules and their dependencies.
 
 Options:
-  --help            Show this help output.
+  -h, --help        Show this help output.
   --plan            Use the outputs from 'tfmake plan'.
   --apply           Use the outputs from 'tfmake apply'.
 EOF
@@ -23,11 +27,11 @@ EOF
 }
 
 target=""
-option="${1}"
+option="${1-}"
 shift
 
 case "${option}" in
-help|--help)
+-h|--help)
   usage
   ;;
 --plan|--apply)

@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-# shellcheck source=/dev/null
-source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
-
 function usage() {
   cat << EOF
 Usage:
@@ -11,7 +8,7 @@ Usage:
   This command generate a Makefile for Terraform plan or apply execution.
 
 Options:
-  --help            Show this help output.
+  -h, --help        Show this help output.
   --plan            Generate a Makefile for 'terraform plan' execution.
   --apply           Generate a Makefile for 'terraform apply' execution.
 EOF
