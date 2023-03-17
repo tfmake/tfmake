@@ -15,7 +15,6 @@ Available Commands:
   makefile          Generate a Makefile for Terraform plan or apply execution.
   mermaid           Generate a Mermaid flowchart diagram from Terraform modules and their dependencies.
   plan              Execute the plan Makefile.
-  setup             Install dependencies.
   summary           Create a Markdown summary.
   touch             Touch modified files.
   version           Show the current version.
