@@ -63,7 +63,7 @@ setup() {
 }
 
 @test "tfmake plan" {
-  bash tfmake touch A/main.tf
+  bash tfmake touch --files A/main.tf
   bash tfmake plan > /dev/null
 
   # kv store

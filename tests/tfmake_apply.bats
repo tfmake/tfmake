@@ -63,7 +63,7 @@ setup() {
 }
 
 @test "tfmake apply" {
-  bash tfmake touch A/main.tf
+  bash tfmake touch --files A/main.tf
   bash tfmake apply > /dev/null
 
   # kv store

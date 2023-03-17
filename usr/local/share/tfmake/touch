@@ -1,9 +1,54 @@
 #!/usr/bin/env bash
 
-# shellcheck source=/dev/null
-source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
+set -u 
 
-files=${1}
+# shellcheck source=/dev/null
+{
+  source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
+  source "${SCRIPT_DIR}/../include/tfmake/store.sh"
+}
+
+function usage() {
+  cat << EOF
+Usage:
+  tfmake touch [options]
+
+  This command touch modified files.
+
+Options:
+  -h, --help        Show this help output.
+  -f, --files       List of files to touch.
+EOF
+  exit
+}
+
+files=""
+
+option="${1-}"
+shift
+
+case "${option}" in
+-h|--help)
+  usage
+  ;;
+-f|--files)
+  files="$*"
+  ;;
+*)
+  usage
+  ;;
+esac
+
+if [[ -z ${files} ]]; then
+  printf ">>> No files, anything to do.\n"
+fi
+
 for file in ${files}; do
-  touch "${file}"
+  if [[ ! -f ${file} && ! -d ${file} ]]; then
+    printf ">>> %s: No such file or directory.\n" "${file}"
+    continue
+  fi
+
+  printf ">>> touch: %s\n" "${file}"
+  touch -c -m "${file}"
 done
