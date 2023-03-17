@@ -1,5 +1,7 @@
 # tfmake
 
+tfmake is a tool for automating Terraform with the power of make.
+
 ```
 Usage:
   tfmake command [options] [args]
@@ -16,8 +18,13 @@ Available Commands:
   setup             Install dependencies.
   summary           Create a Markdown summary.
   touch             Touch modified files.
+  version           Show the current version.
 
 Other options:
   -h, --help        Print this help and exit.
-  --version         Show the current version.
+  -v, --version     An alias for the "version" subcommand.
 ```
+
+## License
+
+[MIT License](https://github.com/tfmake/tfmake/blob/main/LICENSE)
