@@ -15,16 +15,26 @@ file::exist_condition \
 truncate -s 0 "${DATA_DIR}/apply/outputs/visited"
 
 export TF_IN_AUTOMATION=true
-make -i -f "${DATA_DIR}/apply/Makefile"
+make -i -f "${DATA_DIR}/apply/Makefile" 2> "${DATA_DIR}/apply/logs/signpost.log"
 
 store::basepath "${DATA_DIR}/apply/store"
 store::kv visited
 
+exit_code=0
+
 if [[ -f "${DATA_DIR}/apply/outputs/visited" ]]; then
   nodes=$(cat "${DATA_DIR}/apply/outputs/visited")
+
   for node in ${nodes}; do
-    kv::set "${node}" true
+    value=true
+
+    grep -q "make: \[${node}\] Error" "${DATA_DIR}/apply/logs/signpost.log"
+    [[ $? -eq 0 ]] && value=false && exit_code=1
+
+    kv::set "${node}" "${value}"
   done
 fi
 
 rm -f "${DATA_DIR}/apply/outputs/visited"
+
+exit "${exit_code}"
