@@ -28,7 +28,7 @@ if [[ -f "${DATA_DIR}/plan/outputs/visited" ]]; then
   for node in ${nodes}; do
     value=true
 
-    grep -q "make: \[${node}\] Error" "${DATA_DIR}/plan/logs/signpost.log"
+    grep -qE "make: \[.*${node}\] Error .+" "${DATA_DIR}/plan/logs/signpost.log"
     [[ $? -eq 0 ]] && value=false && exit_code=1
 
     kv::set "${node}" "${value}"
