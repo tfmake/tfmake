@@ -8,8 +8,9 @@ set -u
   source "${SCRIPT_DIR}/../include/tfmake/store.sh"
 }
 
-CLASS_DEF_DEFAULT=${CLASS_DEF_DEFAULT:-"fill:#E7F6A4,stroke:#E7F6A4,stroke-width:2px,color:#435200;"}
-CLASS_DEF_VISITED=${CLASS_DEF_VISITED:-"fill:#BACD66,stroke:#435200;"}
+CLASS_DEF_DEFAULT=${CLASS_DEF_DEFAULT:-"fill:#FFFFFF,stroke:#808080,stroke-width:2px,color:#808080;"}
+CLASS_DEF_SUCCEEDED=${CLASS_DEF_SUCCEEDED:-"fill:#BEEC97,stroke:#9BDA67,color:#40800B;"}
+CLASS_DEF_FAILED=${CLASS_DEF_FAILED:-"fill:#FFA3A3,stroke:#F57373,color:#D1464A;"}
 
 function usage() {
   cat << EOF
@@ -52,7 +53,8 @@ cat > "${MERMAID_FILE}" << EOF
 flowchart TB
 
 classDef default ${CLASS_DEF_DEFAULT}
-classDef visited ${CLASS_DEF_VISITED}
+classDef succeeded ${CLASS_DEF_SUCCEEDED}
+classDef failed ${CLASS_DEF_FAILED}
 EOF
 
 file::new_line "${MERMAID_FILE}"
@@ -78,5 +80,11 @@ file::new_line "${MERMAID_FILE}"
 
 nodes=$(kv::keys visited)
 for node in ${nodes}; do
-  echo "${node}:::visited" >> "${MERMAID_FILE}"
+  result=$(kv::get visited "$node")
+
+  if [[ "$result" == "true" ]]; then
+    echo "${node}:::succeeded" >> "${MERMAID_FILE}"
+  else
+    echo "${node}:::failed" >> "${MERMAID_FILE}"
+  fi
 done
