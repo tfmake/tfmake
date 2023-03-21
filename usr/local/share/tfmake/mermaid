@@ -8,9 +8,9 @@ set -u
   source "${SCRIPT_DIR}/../include/tfmake/store.sh"
 }
 
-CLASS_DEF_DEFAULT=${CLASS_DEF_DEFAULT:-"fill:#FFFFFF,stroke:#808080,stroke-width:2px,color:#808080;"}
-CLASS_DEF_SUCCEEDED=${CLASS_DEF_SUCCEEDED:-"fill:#BEEC97,stroke:#9BDA67,color:#40800B;"}
-CLASS_DEF_FAILED=${CLASS_DEF_FAILED:-"fill:#FFA3A3,stroke:#F57373,color:#D1464A;"}
+CLASS_DEF_DEFAULT=${CLASS_DEF_DEFAULT:-"fill:#ffffff,stroke:#585c5e,color:#585c5e;"}
+CLASS_DEF_SUCCEEDED=${CLASS_DEF_SUCCEEDED:-"fill:#a3cfbb,stroke:#136c44,color:#136c44;"}
+CLASS_DEF_FAILED=${CLASS_DEF_FAILED:-"fill:#f0aeb5,stroke:#af2a36,color:#af2a36;"}
 
 function usage() {
   cat << EOF
