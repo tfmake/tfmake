@@ -16,7 +16,7 @@ Usage:
   This command add a comment to a GitHub pull request.
 
 Options:
-  -h, --help        Show this help output.
+  -h, --help, help  Show this help output.
   --plan            Use the outputs from 'tfmake summary --plan'.
   --apply           Use the outputs from 'tfmake summary --apply'.
 EOF
@@ -28,7 +28,7 @@ option="${1-}"
 shift
 
 case "${option}" in
--h|--help)
+-h|--help|help)
   usage
   ;;
 --plan|--apply)

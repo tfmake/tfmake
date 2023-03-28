@@ -36,7 +36,7 @@ Available Commands:
   version           Show the current version.
 
 Other options:
-  -h, --help        Print this help and exit.
+  -h, --help, help  Print this help and exit.
   -v, --version     An alias for the "version" subcommand.
 ```
 

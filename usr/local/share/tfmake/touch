@@ -16,7 +16,7 @@ Usage:
   This command touch modified files.
 
 Options:
-  -h, --help        Show this help output.
+  -h, --help, help  Show this help output.
   -f, --files       List of files to touch.
 EOF
   exit
@@ -28,7 +28,7 @@ option="${1-}"
 shift
 
 case "${option}" in
--h|--help)
+-h|--help|help)
   usage
   ;;
 -f|--files)

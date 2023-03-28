@@ -20,7 +20,7 @@ Usage:
   This command generate a Mermaid flowchart diagram from modules and their dependencies.
 
 Options:
-  -h, --help        Show this help output.
+  -h, --help, help  Show this help output.
   --plan            Use the outputs from 'tfmake plan'.
   --apply           Use the outputs from 'tfmake apply'.
 EOF
@@ -32,7 +32,7 @@ option="${1-}"
 shift
 
 case "${option}" in
--h|--help)
+-h|--help|help)
   usage
   ;;
 --plan|--apply)

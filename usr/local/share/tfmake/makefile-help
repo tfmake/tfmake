@@ -8,7 +8,7 @@ Usage:
   This command generate a Makefile for Terraform plan or apply execution.
 
 Options:
-  -h, --help        Show this help output.
+  -h, --help, help  Show this help output.
   --plan            Generate a Makefile for 'terraform plan' execution.
   --apply           Generate a Makefile for 'terraform apply' execution.
 EOF

@@ -8,7 +8,7 @@ Usage:
   This command create a Markdown summary.
 
 Options:
-  -h, --help        Show this help output.
+  -h, --help, help  Show this help output.
   --plan            Use Mermaid diagram and outputs from 'tfmake plan'.
   --apply           Use Mermaid diagram and outputs from 'tfmake apply'.
 EOF

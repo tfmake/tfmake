@@ -16,7 +16,7 @@ Usage:
   This command initialize the data directory for Terraform plan or apply execution.
 
 Options:
-  -h, --help        Show this help output.
+  -h, --help, help  Show this help output.
   --plan            Initialize the data directory for 'terraform plan' execution.
   --apply           Initialize the data directory for 'terraform aply' execution.
 EOF
@@ -28,7 +28,7 @@ option="${1-}"
 shift
 
 case "${option}" in
--h|--help)
+-h|--help|help)
   usage
   ;;
 --plan|--apply)
