@@ -46,19 +46,23 @@ setup() {
   assert_output A
 }
 
-@test "tfmake plan (before makefile)" {
+@test "tfmake plan     (before makefile)" {
   run bash tfmake plan
   assert_output ">>> Run 'tfmake makefile --plan' first."
 }
 
 @test "tfmake makefile" {
   bash tfmake makefile --plan
-
   assert_file_exist ".tfmake/plan/Makefile"
 }
 
-@test "tfmake mermaid (before plan)" {
+@test "tfmake mermaid  (before plan)" {
   run bash tfmake mermaid --plan
+  assert_output ">>> Run 'tfmake plan' first."
+}
+
+@test "tfmake summary  (before plan)" {
+  run bash tfmake summary --plan --no-diagram
   assert_output ">>> Run 'tfmake plan' first."
 }
 
@@ -79,24 +83,32 @@ setup() {
   done
 }
 
-@test "tfmake summary (before plan)" {
+@test "tfmake summary  (before mermaid)" {
   run bash tfmake summary --plan
   assert_output ">>> Run 'tfmake mermaid --plan' first."
 }
 
+@test "tfmake summary  (without mermaid)" {
+  run bash tfmake summary --plan --no-diagram
+  assert_file_exist ".tfmake/plan/outputs/summary.md"
+}
+
 @test "tfmake mermaid" {
   bash tfmake mermaid --plan
-
   assert_file_exist ".tfmake/plan/outputs/mermaid.md"
 }
 
 @test "tfmake summary" {
   bash tfmake summary --plan
-
   assert_file_exist ".tfmake/plan/outputs/summary.md"
 }
 
-@test "tfmake summary (title)" {
+@test "tfmake summary  (without outputs)" {
+  run bash tfmake summary --plan --no-outputs
+  assert_file_exist ".tfmake/plan/outputs/summary.md"
+}
+
+@test "tfmake summary  (title)" {
   export SUMMARY_TITLE="Basic Project Plan"
   bash tfmake summary --plan
   assert_file_contains ".tfmake/plan/outputs/summary.md" "${SUMMARY_TITLE}"

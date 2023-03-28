@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+
+set -u
+
+# shellcheck source=/dev/null
+{
+  source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
+  source "${SCRIPT_DIR}/../include/tfmake/store.sh"
+}
+
+function usage() {
+  cat << EOF
+Usage:
+  tfmake summary [options]
+
+  This command create a Markdown summary.
+
+Options:
+  -h, --help, help  Show this help output.
+  --plan            Create the summary using 'tfmake plan' outputs.
+  --apply           Create the summary using 'tfmake apply' outputs.
+  --no-diagram      The summary won't contain the Mermaid flowchart diagram.
+  --no-outputs      The summary won't contain the Terraform outputs.
+EOF
+  exit
+}
+
+[[ $# -eq 0 ]] && usage
+
+target=""
+with_diagram=true
+with_outputs=true
+
+while :; do
+  case "${1-}" in
+  -h|--help|help)
+    usage
+    ;;
+  --plan|--apply)
+    target="${1:2}"
+    ;;
+  --no-diagram)
+    with_diagram=false
+    ;;
+  --no-outputs)
+    with_outputs=false
+    ;;
+  ?*)
+    printf ">>> Unknown option: %s\n\n" "${1}"
+    usage
+    ;;
+  *)
+    break
+    ;;
+  esac
+  shift
+done
+
+BACKTICKS='```'
+SUMMARY_TITLE="${SUMMARY_TITLE:-"${target^}"}"
+SUMMARY_FILE="${DATA_DIR}/${target}/outputs/summary.md"
+
+truncate -s 0 "${SUMMARY_FILE}"
+
+file::exist_condition \
+  "${DATA_DIR}/${target}/store/visited/keys" \
+  "tfmake ${target}"
+
+# title
+if [[ -n "${SUMMARY_TITLE}" ]]; then
+  echo "### ${SUMMARY_TITLE}" > "${SUMMARY_FILE}"
+fi
+
+# diagram
+if [[ "${with_diagram}" == "true" ]]; then
+  MERMAID_FILE="${DATA_DIR}/${target}/outputs/mermaid.md"
+
+  file::exist_condition \
+    "${MERMAID_FILE}" \
+    "tfmake mermaid --${target}"
+
+  file::new_line "${SUMMARY_FILE}"
+
+  cat >> "${SUMMARY_FILE}" << EOF
+${BACKTICKS}mermaid
+$(cat "${MERMAID_FILE}")
+${BACKTICKS}
+EOF
+fi
+
+# outputs
+if [[ "${with_outputs}" == "true" ]]; then
+  store::basepath "${DATA_DIR}/${target}/store"
+  nodes=$(kv::keys visited)
+
+  file::new_line "${SUMMARY_FILE}"
+
+  for node in ${nodes}; do
+    cat >> "${SUMMARY_FILE}" << EOF
+<details>
+<summary>Module <strong>"${node}"</strong></summary>
+
+${BACKTICKS}
+$(cat "${DATA_DIR}/${target}/logs/${node}/init.log")
+
+--------------------------------------------------------------------------------
+
+$(cat "${DATA_DIR}/${target}/logs/${node}/${target}.log")
+${BACKTICKS}
+
+</details>
+EOF
+  done
+fi

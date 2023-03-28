@@ -45,9 +45,9 @@ case "${CMD}" in
   echo "tfmake v${VERSION}"
   exit
   ;;
-apply|cleanup|gh-pr-comment|gh-step-summary|mermaid|init|plan|touch)
+apply|cleanup|gh-pr-comment|gh-step-summary|mermaid|init|plan|summary|touch)
   ;;
-makefile|summary)
+makefile)
   tmp="${CMD}-help"
 
   if [[ "${1-}" == "--plan" || "${1-}" == "--apply" ]]; then

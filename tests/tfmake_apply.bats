@@ -46,19 +46,23 @@ setup() {
   assert_output A
 }
 
-@test "tfmake apply (before makefile)" {
+@test "tfmake apply    (before makefile)" {
   run bash tfmake apply
   assert_output ">>> Run 'tfmake makefile --apply' first."
 }
 
 @test "tfmake makefile" {
   bash tfmake makefile --apply
-
   assert_file_exist ".tfmake/apply/Makefile"
 }
 
-@test "tfmake mermaid (before apply)" {
+@test "tfmake mermaid  (before apply)" {
   run bash tfmake mermaid --apply
+  assert_output ">>> Run 'tfmake apply' first."
+}
+
+@test "tfmake summary  (before apply)" {
+  run bash tfmake summary --apply --no-diagram
   assert_output ">>> Run 'tfmake apply' first."
 }
 
@@ -79,24 +83,32 @@ setup() {
   done
 }
 
-@test "tfmake summary (before apply)" {
+@test "tfmake summary  (before mermaid)" {
   run bash tfmake summary --apply
   assert_output ">>> Run 'tfmake mermaid --apply' first."
 }
 
+@test "tfmake summary  (without mermaid)" {
+  run bash tfmake summary --apply --no-diagram
+  assert_file_exist ".tfmake/apply/outputs/summary.md"
+}
+
 @test "tfmake mermaid" {
   bash tfmake mermaid --apply
-
   assert_file_exist ".tfmake/apply/outputs/mermaid.md"
 }
 
 @test "tfmake summary" {
   bash tfmake summary --apply
-
   assert_file_exist ".tfmake/apply/outputs/summary.md"
 }
 
-@test "tfmake summary (title)" {
+@test "tfmake summary  (without outputs)" {
+  run bash tfmake summary --apply --no-outputs
+  assert_file_exist ".tfmake/apply/outputs/summary.md"
+}
+
+@test "tfmake summary  (title)" {
   export SUMMARY_TITLE="Basic Project Apply"
   bash tfmake summary --apply
   assert_file_contains ".tfmake/apply/outputs/summary.md" "${SUMMARY_TITLE}"
