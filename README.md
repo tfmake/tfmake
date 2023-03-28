@@ -2,11 +2,12 @@
 
 tfmake is a tool for automating Terraform with the power of make.
 
-## Installation
-
-### Requirements
+## Requirements
+- bash 4+
 - yq
 - make
+
+## Installation
 
 ### Git
 
