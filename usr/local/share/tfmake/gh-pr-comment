@@ -80,7 +80,7 @@ file::exist_condition \
 
 file::exist_condition \
   "${BREADCRUMBS_FILE}" \
-  "tfmake summary ${target}"
+  "tfmake summary --${target}"
 
 function add_header() {
   cat >> "${1-}" << EOF
