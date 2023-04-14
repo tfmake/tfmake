@@ -46,7 +46,7 @@ setup() {
   assert_output A
 }
 
-@test "tfmake apply    (before makefile)" {
+@test "tfmake apply (before makefile)" {
   run bash tfmake apply
   assert_output ">>> Run 'tfmake makefile --apply' first."
 }
@@ -56,12 +56,12 @@ setup() {
   assert_file_exist ".tfmake/apply/Makefile"
 }
 
-@test "tfmake mermaid  (before apply)" {
+@test "tfmake mermaid (before apply)" {
   run bash tfmake mermaid --apply
   assert_output ">>> Run 'tfmake apply' first."
 }
 
-@test "tfmake summary  (before apply)" {
+@test "tfmake summary (before apply)" {
   run bash tfmake summary --apply --no-diagram
   assert_output ">>> Run 'tfmake apply' first."
 }
@@ -83,12 +83,17 @@ setup() {
   done
 }
 
-@test "tfmake summary  (before mermaid)" {
+@test "tfmake summary (before mermaid)" {
   run bash tfmake summary --apply
   assert_output ">>> Run 'tfmake mermaid --apply' first."
 }
 
-@test "tfmake summary  (without mermaid)" {
+@test "tfmake gh-pr-comment (before summary)" {
+  run bash tfmake gh-pr-comment --apply --number 1 --dry-run
+  assert_output ">>> Run 'tfmake summary --apply' first."
+}
+
+@test "tfmake summary (without mermaid)" {
   run bash tfmake summary --apply --no-diagram
   assert_file_exist ".tfmake/apply/outputs/summary.md"
 }
@@ -103,13 +108,32 @@ setup() {
   assert_file_exist ".tfmake/apply/outputs/summary.md"
 }
 
-@test "tfmake summary  (without outputs)" {
+@test "tfmake summary (without outputs)" {
   run bash tfmake summary --apply --no-outputs
   assert_file_exist ".tfmake/apply/outputs/summary.md"
 }
 
-@test "tfmake summary  (title)" {
+@test "tfmake summary (title)" {
   export SUMMARY_TITLE="Basic Project Apply"
   bash tfmake summary --apply
   assert_file_contains ".tfmake/apply/outputs/summary.md" "${SUMMARY_TITLE}"
+}
+
+@test "tfmake gh-pr-comment (no --plan/--apply)" {
+  run bash tfmake gh-pr-comment --number 1
+  assert_output ">>> Missing '--plan' or '--apply' option."
+}
+
+@test "tfmake gh-pr-comment (no --number)" {
+  run bash tfmake gh-pr-comment --apply
+  assert_output ">>> Missing '--number' option."
+}
+
+@test "tfmake gh-pr-comment (with --dry-run)" {
+  size=$(wc -c ".tfmake/apply/outputs/summary.md" | awk '{print $1-1}')
+  export MAX_COMMENT_SIZE=${size}
+
+  run bash tfmake gh-pr-comment --apply --dry-run
+  assert_file_exist ".tfmake/apply/outputs/fragment-0.md"
+  assert_file_exist ".tfmake/apply/outputs/fragment-1.md"
 }

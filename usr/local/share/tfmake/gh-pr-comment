@@ -11,7 +11,7 @@ set -u
 function usage() {
   cat << EOF
 Usage:
-  tfmake gh-pr-comment [options] NUMBER
+  tfmake gh-pr-comment [options]
 
   This command add a comment to a GitHub pull request.
 
@@ -19,30 +19,121 @@ Options:
   -h, --help, help  Show this help output.
   --plan            Use the outputs from 'tfmake summary --plan'.
   --apply           Use the outputs from 'tfmake summary --apply'.
+  --number          Pull request number.
+  --dry-run         Output the comment or its fragments to stdout.
 EOF
   exit
 }
 
+[[ $# -eq 0 ]] && usage
+
 target=""
-option="${1-}"
-shift
+number=""
+dry_run=false
 
-case "${option}" in
--h|--help|help)
-  usage
-  ;;
---plan|--apply)
-  target="${option:2}"
-  if [[ $# -eq 0 ]]; then
+while :; do
+  case "${1-}" in
+  -h|--help|help)
     usage
-  else
-    NUMBER="${1-}"
+    ;;
+  --plan|--apply)
+    target="${1:2}"
+    ;;
+  --number)
+    number=${2-}
     shift
-  fi
-  ;;
-*)
-  usage
-  ;;
-esac
+    ;;
+  --dry-run)
+    dry_run=true
+    ;;
+  ?*)
+    printf ">>> Unknown option: %s\n\n" "${1}"
+    usage
+    ;;
+  *)
+    break
+    ;;
+  esac
+  shift
+done
 
-gh pr comment "${NUMBER}" -F "${DATA_DIR}/${target}/outputs/summary.md"
+SUMMARY_FILE="${DATA_DIR}/${target}/outputs/summary.md"
+BREADCRUMBS_FILE="${DATA_DIR}/${target}/outputs/breadcrumbs"
+
+# The max value is 35536, but some room is left (2^15).
+readonly MAX_COMMENT_SIZE="${MAX_COMMENT_SIZE:-"32768"}"
+
+# validations
+if [[ -z "${target}" ]]; then
+  printf ">>> Missing '--plan' or '--apply' option.\n"
+  exit 1
+fi
+
+if [[ "${dry_run}" == "false" && -z "${number}" ]]; then
+  printf ">>> Missing '--number' option.\n"
+  exit 1
+fi
+
+file::exist_condition \
+  "${SUMMARY_FILE}" \
+  "tfmake summary --${target}"
+
+file::exist_condition \
+  "${BREADCRUMBS_FILE}" \
+  "tfmake summary ${target}"
+
+function add_header() {
+  cat >> "${1-}" << EOF
+<details>
+  <summary>continuation...</summary>
+
+${BACKTICKS}
+EOF
+}
+
+function add_footer() {
+  cat >> "${1-}" << EOF
+
+${BACKTICKS}
+</details>
+EOF
+}
+
+size=$(wc -c "${SUMMARY_FILE}" | awk '{print $1}')
+
+if [[ ${size} -le ${MAX_COMMENT_SIZE} ]]; then
+  if [[ "${dry_run}" == "true" ]]; then
+    cat "${SUMMARY_FILE}"
+  else
+    gh pr comment "${number}" -F "${SUMMARY_FILE}"
+  fi
+else
+  suffix=0
+  while IFS= read -r line; do
+    offset=$(echo "${line}" | awk '{print $1}')
+    size=$(echo "${line}" | awk '{print $2}')
+
+    fragment_file="${DATA_DIR}/${target}/outputs/fragment-${suffix}.md"
+    truncate -s 0 "${fragment_file}"
+
+    header=$(echo "${line}" | awk '{print $3}')
+    if [[ "${header}" == "true" ]]; then
+      add_header "${fragment_file}"
+    fi
+
+    tail -c "+${offset}" "${SUMMARY_FILE}" | head -c "${size}" >> "${fragment_file}"
+
+    footer=$(echo "${line}" | awk '{print $4}')
+    if [[ "${footer}" == "true" ]]; then
+      add_footer "${fragment_file}"
+    fi
+
+    if [[ "${dry_run}" == "true" ]]; then
+      cat "${fragment_file}"
+    else
+      gh pr comment "${number}" -F "${fragment_file}"
+    fi
+
+    ((suffix=suffix+1))
+  done <  <(awk -f "${SCRIPT_DIR}/../share/tfmake/fragments.awk" "${BREADCRUMBS_FILE}" "${MAX_COMMENT_SIZE}")
+fi

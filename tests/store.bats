@@ -58,7 +58,7 @@ c
 EOF
 }
 
-@test "kv::set  (explicit kv store)" {
+@test "kv::set (explicit kv store)" {
   run kv::set visited "terraform/network/main.tf" true
   hash=$(hash "terraform/network/main.tf")
 
@@ -66,7 +66,7 @@ EOF
   assert_file_contains "${STORE_PATH}/visited/${hash}" true
 }
 
-@test "kv::get  (explicit kv store)" {
+@test "kv::get (explicit kv store)" {
   run kv::set visited "terraform/network/main.tf" true
   run kv::get visited "terraform/network/main.tf"
   assert_output true
@@ -85,13 +85,12 @@ c
 EOF
 }
 
-@test "kv::get  (missing key)" {
+@test "kv::get (missing key)" {
   store::kv modules
 
   run kv::get "missing key"
   assert_output ""
 }
-
 
 @test "kv::keys (split lines)" {
   store::kv letters

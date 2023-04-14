@@ -46,7 +46,7 @@ setup() {
   assert_output A
 }
 
-@test "tfmake plan     (before makefile)" {
+@test "tfmake plan (before makefile)" {
   run bash tfmake plan
   assert_output ">>> Run 'tfmake makefile --plan' first."
 }
@@ -56,12 +56,12 @@ setup() {
   assert_file_exist ".tfmake/plan/Makefile"
 }
 
-@test "tfmake mermaid  (before plan)" {
+@test "tfmake mermaid (before plan)" {
   run bash tfmake mermaid --plan
   assert_output ">>> Run 'tfmake plan' first."
 }
 
-@test "tfmake summary  (before plan)" {
+@test "tfmake summary (before plan)" {
   run bash tfmake summary --plan --no-diagram
   assert_output ">>> Run 'tfmake plan' first."
 }
@@ -83,12 +83,17 @@ setup() {
   done
 }
 
-@test "tfmake summary  (before mermaid)" {
+@test "tfmake summary (before mermaid)" {
   run bash tfmake summary --plan
   assert_output ">>> Run 'tfmake mermaid --plan' first."
 }
 
-@test "tfmake summary  (without mermaid)" {
+@test "tfmake gh-pr-comment (before summary)" {
+  run bash tfmake gh-pr-comment --plan --number 1 --dry-run
+  assert_output ">>> Run 'tfmake summary --plan' first."
+}
+
+@test "tfmake summary (without mermaid)" {
   run bash tfmake summary --plan --no-diagram
   assert_file_exist ".tfmake/plan/outputs/summary.md"
 }
@@ -103,13 +108,32 @@ setup() {
   assert_file_exist ".tfmake/plan/outputs/summary.md"
 }
 
-@test "tfmake summary  (without outputs)" {
+@test "tfmake summary (without outputs)" {
   run bash tfmake summary --plan --no-outputs
   assert_file_exist ".tfmake/plan/outputs/summary.md"
 }
 
-@test "tfmake summary  (title)" {
+@test "tfmake summary (with title)" {
   export SUMMARY_TITLE="Basic Project Plan"
   bash tfmake summary --plan
   assert_file_contains ".tfmake/plan/outputs/summary.md" "${SUMMARY_TITLE}"
+}
+
+@test "tfmake gh-pr-comment (no --plan/--apply)" {
+  run bash tfmake gh-pr-comment --number 1
+  assert_output ">>> Missing '--plan' or '--apply' option."
+}
+
+@test "tfmake gh-pr-comment (no --number)" {
+  run bash tfmake gh-pr-comment --plan
+  assert_output ">>> Missing '--number' option."
+}
+
+@test "tfmake gh-pr-comment (with --dry-run)" {
+  size=$(wc -c ".tfmake/plan/outputs/summary.md" | awk '{print $1-1}')
+  export MAX_COMMENT_SIZE=${size}
+
+  run bash tfmake gh-pr-comment --plan --dry-run
+  assert_file_exist ".tfmake/plan/outputs/fragment-0.md"
+  assert_file_exist ".tfmake/plan/outputs/fragment-1.md"
 }

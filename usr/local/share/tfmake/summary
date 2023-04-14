@@ -56,44 +56,60 @@ while :; do
   shift
 done
 
-BACKTICKS='```'
+MERMAID_FILE="${DATA_DIR}/${target}/outputs/mermaid.md"
 SUMMARY_TITLE="${SUMMARY_TITLE:-"${target^}"}"
 SUMMARY_FILE="${DATA_DIR}/${target}/outputs/summary.md"
+BREADCRUMBS_FILE="${DATA_DIR}/${target}/outputs/breadcrumbs"
 
-truncate -s 0 "${SUMMARY_FILE}"
+# validations
+if [[ -z "${target}" ]]; then
+  printf ">>> Missing '--plan' or '--apply' option.\n"
+  exit 1
+fi
 
 file::exist_condition \
   "${DATA_DIR}/${target}/store/visited/keys" \
   "tfmake ${target}"
 
+if [[ "${with_diagram}" == "true" ]]; then
+  file::exist_condition \
+    "${DATA_DIR}/${target}/outputs/mermaid.md" \
+    "tfmake mermaid --${target}"
+fi
+
+function breadcrumb() {
+  bytes=$(wc -c "${SUMMARY_FILE}" | awk '{print $1}')
+
+  printf "%s\t%d\n" "${1-}" "${bytes}" >> "${BREADCRUMBS_FILE}"
+}
+
+truncate -s 0 "${SUMMARY_FILE}" "${BREADCRUMBS_FILE}"
+
 # title
 if [[ -n "${SUMMARY_TITLE}" ]]; then
   echo "### ${SUMMARY_TITLE}" > "${SUMMARY_FILE}"
+  file::new_line "${SUMMARY_FILE}"
+
+  breadcrumb "title"
 fi
 
 # diagram
 if [[ "${with_diagram}" == "true" ]]; then
-  MERMAID_FILE="${DATA_DIR}/${target}/outputs/mermaid.md"
-
-  file::exist_condition \
-    "${MERMAID_FILE}" \
-    "tfmake mermaid --${target}"
-
-  file::new_line "${SUMMARY_FILE}"
-
   cat >> "${SUMMARY_FILE}" << EOF
 ${BACKTICKS}mermaid
 $(cat "${MERMAID_FILE}")
 ${BACKTICKS}
 EOF
+
+  file::new_line "${SUMMARY_FILE}"
+
+  breadcrumb "diagram"
 fi
 
 # outputs
 if [[ "${with_outputs}" == "true" ]]; then
   store::basepath "${DATA_DIR}/${target}/store"
   nodes=$(kv::keys visited)
-
-  file::new_line "${SUMMARY_FILE}"
 
   for node in ${nodes}; do
     cat >> "${SUMMARY_FILE}" << EOF
@@ -110,5 +126,7 @@ ${BACKTICKS}
 
 </details>
 EOF
+
+    breadcrumb "module"
   done
 fi
