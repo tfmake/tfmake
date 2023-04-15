@@ -5,23 +5,23 @@ BEGIN {
   max = ARGV[2]
   ARGV[2] = ""
 
-  offset = 1
+  b_start = offset = 1
 }
 
 # each line is made by two fields: "section" and "bytes"
 {
-  section = $1
-  b_start = pb + 1
   b_end = $2
 
-  diff = b_end - pb
+  diff = b_end - b_start + 1
 
   # number of bytes is equal or greater than max
   if (diff >= max) {
-    # if there is some accumulated value, fragment it!
     if (acc > 0) {
+      # there is some accumulated value, fragment it!
+      fragment(offset, acc, "false", "false")
+
+      # reset the accumulator
       acc = 0
-      fragment(offset, size, "false", "false")
     }
 
     # fragment the section itself; a = b * q + r
@@ -37,22 +37,24 @@ BEGIN {
     offset = b_end + 1
   }
 
-  # number of bytes is lower than max; but including
-  # the current bytes exceeds the value, fragment it!
-  if (diff < max && (acc += diff) > max) {
-    acc = 0
+  # number of bytes is lower than max
+  if (diff < max) {
+    if (acc + diff > max) {
+      # including the current bytes exceeds max, fragment it!
+      fragment(offset, acc, "false", "false")
 
-    # fragment the previous section bytes
-    fragment(offset, size, "false", "false")
-    # fragment the current section bytes
-    fragment(b_start, diff, "false", "false")
+      # set the accumulator to the current bytes
+      acc = diff
 
-    # move the offset forward
-    offset = b_end + 1
+      # set offset to the current section start
+      offset = b_start
+    } else {
+      acc += diff
+    }
   }
 
-  # save previous value
-  pb = size = b_end
+  # move forward
+  b_start = b_end + 1
 }
 
 END {
