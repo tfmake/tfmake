@@ -8,4 +8,35 @@ set -u
   source "${SCRIPT_DIR}/../include/tfmake/store.sh"
 }
 
-rm -rf "${DATA_DIR}"
+function usage() {
+  cat << EOF
+Usage:
+  tfmake cleanup [options]
+
+  This command cleanup the data directory.
+
+Options:
+  -h, --help, help  Show this help output.
+  --plan            Cleanup the data directory for 'terraform plan' execution.
+  --apply           Cleanup the data directory for 'terraform apply' execution.
+EOF
+  exit
+}
+
+target=""
+option="${1-}"
+shift
+
+case "${option}" in
+-h|--help|help)
+  usage
+  ;;
+--plan|--apply)
+  target="${option:2}"
+  ;;
+*)
+  usage
+  ;;
+esac
+
+rm -rf "${DATA_DIR:?}/${target}"

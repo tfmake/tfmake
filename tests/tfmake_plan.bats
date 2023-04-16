@@ -11,7 +11,7 @@ setup() {
 }
 
 @test "tfmake cleanup" {
-  bash tfmake cleanup
+  bash tfmake cleanup --plan
 }
 
 @test "tfmake makefile (before init)" {
