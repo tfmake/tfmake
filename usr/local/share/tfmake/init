@@ -18,7 +18,7 @@ Usage:
 Options:
   -h, --help, help  Show this help output.
   --plan            Initialize the data directory for 'terraform plan' execution.
-  --apply           Initialize the data directory for 'terraform aply' execution.
+  --apply           Initialize the data directory for 'terraform apply' execution.
 EOF
   exit
 }
