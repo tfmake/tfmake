@@ -61,11 +61,14 @@ file::new_line "${MERMAID_FILE}"
 
 store::basepath "${DATA_DIR}/${target}/store"
 
-modules=$(kv::keys modules)
+store::use modules
+modules=$(kv::keys)
+
+store::use dependencies
 for module in ${modules}; do
   echo "${module}($module)" >> "${MERMAID_FILE}"
 
-  deps=$(kv::get dependencies "${module}")
+  deps=$(kv::get "${module}")
 
   if [[ -n ${deps} ]]; then
     deps=${deps//,/ }
@@ -78,9 +81,11 @@ done
 
 file::new_line "${MERMAID_FILE}"
 
-nodes=$(kv::keys visited)
+store::use visited
+nodes=$(kv::keys)
+
 for node in ${nodes}; do
-  result=$(kv::get visited "$node")
+  result=$(kv::get "$node")
 
   if [[ "$result" == "true" ]]; then
     echo "${node}:::succeeded" >> "${MERMAID_FILE}"

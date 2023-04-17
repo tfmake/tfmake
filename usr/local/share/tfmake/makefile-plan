@@ -16,7 +16,8 @@ file::exist_condition \
 
 store::basepath "${DATA_DIR}/plan/store"
 
-modules=$(kv::keys modules)
+store::use modules
+modules=$(kv::keys)
 
 cat > "${DATA_DIR}/plan/Makefile" << EOF
 SHELL=$(which bash) -o pipefail
@@ -24,8 +25,9 @@ SHELL=$(which bash) -o pipefail
 all: $(utils::splitlines "${modules}")
 EOF
 
+store::use dependencies
 for module in ${modules}; do
-  deps=$(kv::get dependencies "${module}")
+  deps=$(kv::get "${module}")
   [[ -n ${deps} ]] && deps=${deps//,/ }
 
   file::new_line "${DATA_DIR}/plan/Makefile"

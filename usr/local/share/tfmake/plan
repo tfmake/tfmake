@@ -18,13 +18,13 @@ export TF_IN_AUTOMATION=true
 make -i -f "${DATA_DIR}/plan/Makefile" 2> "${DATA_DIR}/plan/logs/signpost.log"
 
 store::basepath "${DATA_DIR}/plan/store"
-store::kv visited
 
 exit_code=0
 
 if [[ -f "${DATA_DIR}/plan/outputs/visited" ]]; then
   nodes=$(cat "${DATA_DIR}/plan/outputs/visited")
 
+  store::use visited
   for node in ${nodes}; do
     value=true
 

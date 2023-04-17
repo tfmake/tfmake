@@ -36,13 +36,17 @@ setup() {
   # kv store
   store::basepath .tfmake/plan/store
 
-  run kv::get modules A
+  store::use modules
+
+  run kv::get A
   assert_output true
 
-  run kv::get modules B
+  run kv::get B
   assert_output true
 
-  run kv::get dependencies B
+  store::use dependencies
+
+  run kv::get B
   assert_output A
 }
 
@@ -73,11 +77,13 @@ setup() {
   # kv store
   store::basepath .tfmake/plan/store
 
-  run utils::splitlines "$(kv::keys modules)"
+  store::use modules
+
+  run utils::splitlines "$(kv::keys)"
   assert_output "A B"
 
   # terraform logs
-  for key in $(utils::splitlines "$(kv::keys modules)"); do
+  for key in $(utils::splitlines "$(kv::keys)"); do
     assert_file_exist ".tfmake/plan/logs/${key}/init.log"
     assert_file_exist ".tfmake/plan/logs/${key}/plan.log"
   done

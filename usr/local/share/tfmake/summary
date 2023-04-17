@@ -109,7 +109,9 @@ fi
 # outputs
 if [[ "${with_outputs}" == "true" ]]; then
   store::basepath "${DATA_DIR}/${target}/store"
-  nodes=$(kv::keys visited)
+
+  store::use visited
+  nodes=$(kv::keys)
 
   for node in ${nodes}; do
     cat >> "${SUMMARY_FILE}" << EOF
