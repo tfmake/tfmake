@@ -121,7 +121,12 @@ else
       add_header "${fragment_file}"
     fi
 
-    tail -c "+${offset}" "${SUMMARY_FILE}" | head -c "${size}" >> "${fragment_file}"
+    dd status=none \
+      bs=1 \
+      skip="${offset}" \
+      count="${size}" \
+      if="${SUMMARY_FILE}" \
+      of="${fragment_file}" 
 
     footer=$(echo "${line}" | awk '{print $4}')
     if [[ "${footer}" == "true" ]]; then
