@@ -43,6 +43,20 @@ if [[ -z ${files} ]]; then
   printf ">>> No files, anything to do.\n"
 fi
 
+store::basepath "${DATA_DIR}/plan/store"
+store::use modules
+
+modules=$(utils::splitlines "$(kv::keys)")
+
+# Set the same time in all directories before touch individual files.
+mtime=$(date +%Y%m%d%H%M.%S)
+# shellcheck disable=SC2086
+touch -c -m -t "${mtime}" ${modules}
+
+# Wait one second, so the next calls to 'touch' use a different time.
+sleep 1
+
+store::truncate modified
 for file in ${files}; do
   if [[ ! -f ${file} && ! -d ${file} ]]; then
     printf ">>> %s: No such file or directory.\n" "${file}"
@@ -51,4 +65,6 @@ for file in ${files}; do
 
   printf ">>> touch: %s\n" "${file}"
   touch -c -m "${file}"
+
+  kv::set "${file}" true
 done

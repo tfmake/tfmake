@@ -8,6 +8,45 @@ set -u
   source "${SCRIPT_DIR}/../include/tfmake/store.sh"
 }
 
+function usage() {
+  cat << EOF
+Usage:
+  tfmake plan [options]
+
+  This command execute the plan Makefile.
+
+Options:
+  -h, --help, help  Show this help output.
+  --all             Execute the plan Makefile for all modules.
+  --dry-run         Print the modules that would be executed, but don't execute them.
+EOF
+  exit
+}
+
+mode="default"
+
+while :; do
+  case "${1-}" in
+  -h|--help)
+    usage
+    ;;
+  --all)
+    mode="all"
+    ;;
+  --dry-run)
+    mode="dry-run"
+    ;;
+  ?*)
+    printf ">>> Unknown option: %s\n\n" "${1}"
+    usage
+    ;;
+  *)
+    break
+    ;;
+  esac
+  shift
+done
+
 file::exist_condition \
   "${DATA_DIR}/plan/Makefile" \
   "tfmake makefile --plan"
@@ -15,10 +54,38 @@ file::exist_condition \
 truncate -s 0 "${DATA_DIR}/plan/outputs/visited"
 
 export TF_IN_AUTOMATION=true
-make -i -f "${DATA_DIR}/plan/Makefile" 2> "${DATA_DIR}/plan/logs/signpost.log"
 
 store::basepath "${DATA_DIR}/plan/store"
 
+# "default" mode
+if [[ "${mode}" == "default" ]]; then
+  make -i -r -R -f "${DATA_DIR}/plan/Makefile" 2> "${DATA_DIR}/plan/logs/signpost.log"
+fi
+
+# "all" is useful for drift detection; 'tfmake touch' is not needed.
+if [[ "${mode}" == "all" ]]; then
+  make -B -i -r -R -f "${DATA_DIR}/plan/Makefile" 2> "${DATA_DIR}/plan/logs/signpost.log"
+fi
+
+# "dry-run" print the modules that would be executed, but don't execute them.
+if [[ "${mode}" == "dry-run" ]]; then
+  make -t -r -R -f "${DATA_DIR}/plan/Makefile" | awk '/^touch/ {print $2}'
+
+  # As 'make -t' touch files and fool future invocations; the next calls to 'touch'
+  # aim to prevent that behavior.
+
+  # Wait one second, so the next calls to 'touch' use a different time.
+  sleep 1
+
+  store::use modified
+
+  files=$(utils::splitlines "$(kv::keys)")
+  for file in ${files}; do
+    touch -c -m "${file}"
+  done
+fi
+
+# look for errors and exit properly
 exit_code=0
 
 if [[ -f "${DATA_DIR}/plan/outputs/visited" ]]; then

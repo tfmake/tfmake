@@ -18,6 +18,16 @@ function store::use() {
   export KV_PATH
 }
 
+function store::truncate() {
+  KV_PATH="${STORE_PATH}/${1-}"
+
+  if [[ -d "${KV_PATH}" ]]; then
+    find "${KV_PATH}" -type f -delete
+  fi
+  
+  store::use "${1-}"
+}
+
 function kv::set() {
   key=${1}; value=${2};
 

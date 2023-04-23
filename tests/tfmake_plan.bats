@@ -71,13 +71,13 @@ setup() {
 }
 
 @test "tfmake plan" {
-  bash tfmake touch --files A/main.tf
+  bash tfmake touch -f A/main.tf
   bash tfmake plan > /dev/null
 
   # kv store
   store::basepath .tfmake/plan/store
 
-  store::use modules
+  store::use visited
 
   run utils::splitlines "$(kv::keys)"
   assert_output "A B"
@@ -87,6 +87,42 @@ setup() {
     assert_file_exist ".tfmake/plan/logs/${key}/init.log"
     assert_file_exist ".tfmake/plan/logs/${key}/plan.log"
   done
+}
+
+@test "tfmake plan (second time)" {
+  run bash tfmake plan > /dev/null
+  assert_output --partial "make: Nothing to be done for" 
+}
+
+@test "tfmake plan (all)" {
+  bash tfmake plan --all > /dev/null
+
+  # kv store
+  store::basepath .tfmake/plan/store
+
+  store::use visited
+
+  run utils::splitlines "$(kv::keys)"
+  assert_output "A B"
+
+  # terraform logs
+  for key in $(utils::splitlines "$(kv::keys)"); do
+    assert_file_exist ".tfmake/plan/logs/${key}/init.log"
+    assert_file_exist ".tfmake/plan/logs/${key}/plan.log"
+  done
+}
+
+@test "tfmake plan (dry run)" {
+  bash tfmake touch -f A/main.tf
+  run bash tfmake plan --dry-run
+  assert_output - << EOF
+A
+B
+EOF
+
+  bash tfmake touch -f B/main.tf
+  run bash tfmake plan --dry-run
+  assert_output B
 }
 
 @test "tfmake summary (before mermaid)" {

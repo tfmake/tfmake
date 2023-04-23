@@ -24,6 +24,20 @@ function teardown() {
   assert_file_empty "${STORE_PATH}/modules/keys"
 }
 
+@test "store::truncate" {
+  store::truncate modified
+
+  assert_dir_exist "${STORE_PATH}/modified"
+  assert_file_empty "${STORE_PATH}/modified/keys"
+
+  run kv::set "terraform/network/main.tf" true
+  run kv::get "terraform/network/main.tf"
+  assert_output true
+
+  store::truncate modified
+  assert_file_empty "${STORE_PATH}/modified/keys"
+}
+
 @test "kv::set" {
   store::use modules
 
