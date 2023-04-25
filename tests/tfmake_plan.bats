@@ -70,8 +70,29 @@ setup() {
   assert_output ">>> Run 'tfmake plan' first."
 }
 
+@test "tfmake touch" {
+  bash tfmake touch --plan -f "A/main.tf A/terraform.tfvars"
+
+  # kv store
+  store::basepath .tfmake/plan/store
+  store::use modified
+
+  run utils::splitlines "$(kv::keys)"
+  assert_output "A/main.tf A/terraform.tfvars"
+}
+
+@test "tfmake touch (repeated -f)" {
+  bash tfmake touch --plan -f A/main.tf -f A/terraform.tfvars
+
+  # kv store
+  store::basepath .tfmake/plan/store
+  store::use modified
+
+  run utils::splitlines "$(kv::keys)"
+  assert_output "A/main.tf A/terraform.tfvars"
+}
+
 @test "tfmake plan" {
-  bash tfmake touch -f A/main.tf
   bash tfmake plan > /dev/null
 
   # kv store
@@ -91,7 +112,7 @@ setup() {
 
 @test "tfmake plan (second time)" {
   run bash tfmake plan > /dev/null
-  assert_output --partial "make: Nothing to be done for" 
+  assert_output --partial "make: Nothing to be done for"
 }
 
 @test "tfmake plan (all)" {
@@ -113,14 +134,14 @@ setup() {
 }
 
 @test "tfmake plan (dry run)" {
-  bash tfmake touch -f A/main.tf
+  bash tfmake touch --plan -f A/main.tf
   run bash tfmake plan --dry-run
   assert_output - << EOF
 A
 B
 EOF
 
-  bash tfmake touch -f B/main.tf
+  bash tfmake touch --plan -f B/main.tf
   run bash tfmake plan --dry-run
   assert_output B
 }

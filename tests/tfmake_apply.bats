@@ -70,8 +70,29 @@ setup() {
   assert_output ">>> Run 'tfmake apply' first."
 }
 
+@test "tfmake touch" {
+  bash tfmake touch --apply -f "A/main.tf A/terraform.tfvars"
+
+  # kv store
+  store::basepath .tfmake/apply/store
+  store::use modified
+
+  run utils::splitlines "$(kv::keys)"
+  assert_output "A/main.tf A/terraform.tfvars"
+}
+
+@test "tfmake touch (repeated -f)" {
+  bash tfmake touch --apply -f A/main.tf -f A/terraform.tfvars
+
+  # kv store
+  store::basepath .tfmake/apply/store
+  store::use modified
+
+  run utils::splitlines "$(kv::keys)"
+  assert_output "A/main.tf A/terraform.tfvars"
+}
+
 @test "tfmake apply" {
-  bash tfmake touch -f A/main.tf
   bash tfmake apply > /dev/null
 
   # kv store
@@ -113,14 +134,14 @@ setup() {
 }
 
 @test "tfmake apply (dry run)" {
-  bash tfmake touch -f A/main.tf
+  bash tfmake touch --apply -f A/main.tf
   run bash tfmake apply --dry-run
   assert_output - << EOF
 A
 B
 EOF
 
-  bash tfmake touch -f B/main.tf
+  bash tfmake touch --apply -f B/main.tf
   run bash tfmake apply --dry-run
   assert_output B
 }
