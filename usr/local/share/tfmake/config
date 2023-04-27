@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+
+set -u
+
+# shellcheck source=/dev/null
+{
+  source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
+  source "${SCRIPT_DIR}/../include/tfmake/store.sh"
+}
+
+function usage() {
+  cat << EOF
+Usage:
+  tfmake config [options]
+
+  This command modify tfmake configuration.
+
+Options:
+  -h, --help, help  Show this help output.
+  --set             Set a tfmake configuration value.
+  --get             Get a tfmake configuration value.
+EOF
+  exit
+}
+
+[[ $# -eq 0 ]] && usage
+
+action=""
+key=""
+value=""
+
+while :; do
+  case "${1-}" in
+  -h|--help|help)
+    usage
+    ;;
+  --set)
+    action="set"
+    key="${2-}"
+    value="${3-}"
+    shift 2
+    ;;
+  --get)
+    action="get"
+    key="${2-}"
+    shift
+    ;;
+  ?*)
+    printf ">>> Unknown option: %s\n\n" "${1}"
+    usage
+    ;;
+  *)
+    break
+    ;;
+  esac
+  shift
+done
+
+store::basepath "${DATA_DIR}/global/store"
+store::use config
+
+# set a config value
+if [[ "${action}" == "set" ]]; then
+  # validation
+  if [[ -z "${key}" ]]; then
+    log::err ">>> Missing config key."
+  fi
+
+  if [[ -z "${value}" ]]; then
+    log::err ">>> Missing config value."
+  fi
+
+  kv::set "${key}" "${value}"
+  printf "%s=%s\n" "${key}" "${value}"
+fi
+
+# get a config value
+if [[ "${action}" == "get" ]]; then
+  # validation
+  if [[ -z "${key}" ]]; then
+    log::err ">>> Missing config key."
+  fi
+
+  kv::get "${key}"
+fi
