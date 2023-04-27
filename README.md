@@ -26,6 +26,7 @@ Usage:
 Available Commands:
   apply             Execute the apply Makefile.
   cleanup           Cleanup the data directory.
+  config            Modify tfmake configuration.
   gh-pr-comment     Add a comment to a GitHub pull request.
   gh-step-summary   Add content to GitHub Step Summary.
   init              Initialize the data directory for Terraform plan or apply execution.
