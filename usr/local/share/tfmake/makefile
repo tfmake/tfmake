@@ -11,9 +11,9 @@ set -u
 function usage() {
   cat << EOF
 Usage:
-  tfmake cleanup [options]
+  tfmake makefile [options]
 
-  This command cleanup the data directory.
+  This command generate a Makefile for Terraform plan/apply execution.
 
 Options:
   -h, --help, help  Show this help output.
@@ -31,4 +31,5 @@ case "${1-}" in
   ;;
 esac
 
-rm -rf "${DATA_DIR:?}/${TFMAKE_CONTEXT}"
+SCRIPT_PATH="${SCRIPT_DIR}/../share/tfmake/makefile-${TFMAKE_CONTEXT}"
+exec "bash" "${SCRIPT_PATH}" "$@"

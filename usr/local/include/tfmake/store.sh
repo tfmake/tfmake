@@ -24,7 +24,7 @@ function store::truncate() {
   if [[ -d "${KV_PATH}" ]]; then
     find "${KV_PATH}" -type f -delete
   fi
-  
+
   store::use "${1-}"
 }
 

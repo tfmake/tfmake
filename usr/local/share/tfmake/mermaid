@@ -21,33 +21,27 @@ Usage:
 
 Options:
   -h, --help, help  Show this help output.
-  --plan            Use the outputs from 'tfmake plan'.
-  --apply           Use the outputs from 'tfmake apply'.
 EOF
   exit
 }
 
-target=""
-option="${1-}"
-shift
-
-case "${option}" in
+case "${1-}" in
 -h|--help|help)
   usage
   ;;
---plan|--apply)
-  target="${option:2}"
-  ;;
-*)
+?*)
+  printf ">>> Unknown option: %s\n\n" "${1}"
   usage
   ;;
 esac
 
+# validations
 file::exist_condition \
-  "${DATA_DIR}/${target}/store/visited/keys" \
-  "tfmake ${target}"
+  "${DATA_DIR}/${TFMAKE_CONTEXT}/store/visited/keys" \
+  "tfmake run"
 
-MERMAID_FILE="${DATA_DIR}/${target}/outputs/mermaid.md"
+# subcommand
+MERMAID_FILE="${DATA_DIR}/${TFMAKE_CONTEXT}/outputs/mermaid.md"
 
 cat > "${MERMAID_FILE}" << EOF
 flowchart TB
@@ -59,7 +53,7 @@ EOF
 
 file::new_line "${MERMAID_FILE}"
 
-store::basepath "${DATA_DIR}/${target}/store"
+store::basepath "${DATA_DIR}/${TFMAKE_CONTEXT}/store"
 
 store::use modules
 modules=$(kv::keys)

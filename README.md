@@ -24,18 +24,20 @@ Usage:
   tfmake command [options] [args]
 
 Available Commands:
-  apply             Execute the apply Makefile.
   cleanup           Cleanup the data directory.
   config            Modify tfmake configuration.
-  gh-pr-comment     Add a comment to a GitHub pull request.
-  gh-step-summary   Add content to GitHub Step Summary.
-  init              Initialize the data directory for Terraform plan or apply execution.
-  makefile          Generate a Makefile for Terraform plan or apply execution.
+  context           An alias for 'tfmake config' over the context value.
+  init              Initialize the data directory for Terraform plan/apply execution.
+  makefile          Generate a Makefile for Terraform plan/apply execution.
   mermaid           Generate a Mermaid flowchart diagram from Terraform modules and their dependencies.
-  plan              Execute the plan Makefile.
+  run               Run the Terraform plan/apply Makefile.
   summary           Create a Markdown summary.
   touch             Touch modified files.
   version           Show the current version.
+
+GitHub Commands:
+  gh-pr-comment     Add a comment to a GitHub pull request.
+  gh-step-summary   Add content to GitHub Step Summary.
 
 Other options:
   -h, --help, help  Print this help and exit.
@@ -50,27 +52,19 @@ flowchart LR
 classDef primary fill:#a3cfbb,stroke:#a3cfbb,color:#136c44;
 classDef secondary fill:#fee69b,stroke:#fee69b,color:#987405;
 
+context("tfmake context")
 init("tfmake init")
 makefile("tfmake makefile")
 touch("tfmake touch")
-plan("tfmake plan")
-apply("tfmake apply")
-mermaid("tfmake mermaid")
-summary("tfmake summary")
+run("tfmake run")
 
-init --> makefile --> touch
-touch -- plan --> plan
-touch -- apply --> apply
-plan & apply --> mermaid --> summary
+context --> init --> makefile --> touch --> run
 
+context:::primary
 init:::primary
 makefile:::primary
 touch:::primary
-plan:::primary
-apply:::primary
-
-mermaid:::secondary
-summary:::secondary
+run:::primary
 ```
 
 ### GitHub Actions commands

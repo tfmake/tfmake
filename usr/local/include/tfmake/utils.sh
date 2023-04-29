@@ -28,3 +28,10 @@ function file::exist_condition () {
     log::err ">>> Run '${command}' first."
   fi
 }
+
+function validate::context() {
+  if [[ ! "${1-}" =~ ^(plan|apply)$ ]]; then
+    printf ">>> Invalid context: %s.\n" "${1-}"
+    exit 1
+  fi
+}

@@ -17,57 +17,38 @@ Usage:
 
 Options:
   -h, --help, help  Show this help output.
-  --plan            Use the outputs from 'tfmake summary --plan'.
-  --apply           Use the outputs from 'tfmake summary --apply'.
   --number          Pull request number.
   --dry-run         Output the comment or its fragments to stdout.
 EOF
   exit
 }
 
-[[ $# -eq 0 ]] && usage
-
-target=""
 number=""
 dry_run=false
 
-while :; do
-  case "${1-}" in
-  -h|--help|help)
-    usage
-    ;;
-  --plan|--apply)
-    target="${1:2}"
-    ;;
-  --number)
-    number=${2-}
-    shift
-    ;;
-  --dry-run)
-    dry_run=true
-    ;;
-  ?*)
-    printf ">>> Unknown option: %s\n\n" "${1}"
-    usage
-    ;;
-  *)
-    break
-    ;;
-  esac
+case "${1-}" in
+-h|--help|help)
+  usage
+  ;;
+--number)
+  number=${2-}
   shift
-done
+  ;;
+--dry-run)
+  dry_run=true
+  ;;
+?*)
+  printf ">>> Unknown option: %s\n\n" "${1}"
+  usage
+  ;;
+esac
 
-SUMMARY_FILE="${DATA_DIR}/${target}/outputs/summary.md"
-BREADCRUMBS_FILE="${DATA_DIR}/${target}/outputs/breadcrumbs"
+# validations
+SUMMARY_FILE="${DATA_DIR}/${TFMAKE_CONTEXT}/outputs/summary.md"
+BREADCRUMBS_FILE="${DATA_DIR}/${TFMAKE_CONTEXT}/outputs/breadcrumbs"
 
 # The max value is 35536, but some room is left (2^15).
 readonly MAX_COMMENT_SIZE="${MAX_COMMENT_SIZE:-"32768"}"
-
-# validations
-if [[ -z "${target}" ]]; then
-  printf ">>> Missing '--plan' or '--apply' option.\n"
-  exit 1
-fi
 
 if [[ "${dry_run}" == "false" && -z "${number}" ]]; then
   printf ">>> Missing '--number' option.\n"
@@ -76,12 +57,13 @@ fi
 
 file::exist_condition \
   "${SUMMARY_FILE}" \
-  "tfmake summary --${target}"
+  "tfmake summary"
 
 file::exist_condition \
   "${BREADCRUMBS_FILE}" \
-  "tfmake summary --${target}"
+  "tfmake summary"
 
+# subcommand
 function add_header() {
   cat >> "${1-}" << EOF
 <details>
@@ -113,7 +95,7 @@ else
     offset=$(echo "${line}" | awk '{print $1}')
     size=$(echo "${line}" | awk '{print $2}')
 
-    fragment_file="${DATA_DIR}/${target}/outputs/fragment-${suffix}.md"
+    fragment_file="${DATA_DIR}/${TFMAKE_CONTEXT}/outputs/fragment-${suffix}.md"
     truncate -s 0 "${fragment_file}"
 
     header=$(echo "${line}" | awk '{print $3}')

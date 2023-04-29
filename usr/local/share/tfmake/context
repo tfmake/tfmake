@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+set -u
+
+# shellcheck source=/dev/null
+{
+  source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
+  source "${SCRIPT_DIR}/../include/tfmake/store.sh"
+}
+
+function usage() {
+  cat << EOF
+Usage:
+  tfmake context [options]
+
+  This command is an alias for 'tfmake config' over the context value.
+
+Options:
+  -h, --help, help  Show this help output.
+  plan             Set the context value as 'plan'.
+  apply            Set the context value as 'apply'.
+EOF
+  exit
+}
+
+SCRIPT_PATH="${SCRIPT_DIR}/../share/tfmake/config"
+
+[[ $# -eq 0 ]] && \
+  exec "bash" "${SCRIPT_PATH}" --get context
+
+case "${1-}" in
+-h|--help|help)
+  usage
+  ;;
+plan|apply)
+  exec "bash" "${SCRIPT_PATH}" --set context "${1}"
+  ;;
+?*)
+  printf ">>> Unknown option: %s\n\n" "${1}"
+  usage
+  ;;
+esac

@@ -13,37 +13,28 @@ function usage() {
 Usage:
   tfmake init [options]
 
-  This command initialize the data directory for Terraform plan or apply execution.
+  This command initialize the data directory for Terraform plan/apply execution.
 
 Options:
   -h, --help, help  Show this help output.
-  --plan            Initialize the data directory for 'terraform plan' execution.
-  --apply           Initialize the data directory for 'terraform apply' execution.
 EOF
   exit
 }
 
-target=""
-option="${1-}"
-shift
-
-case "${option}" in
+case "${1-}" in
 -h|--help|help)
   usage
   ;;
---plan|--apply)
-  target="${option:2}"
-  ;;
-*)
+?*)
+  printf ">>> Unknown option: %s\n\n" "${1}"
   usage
   ;;
 esac
 
-mkdir -p "${DATA_DIR}/${target}/logs"
-mkdir -p "${DATA_DIR}/${target}/outputs"
-mkdir -p "${DATA_DIR}/${target}/store"
+mkdir -p "${DATA_DIR}/${TFMAKE_CONTEXT}/logs"
+mkdir -p "${DATA_DIR}/${TFMAKE_CONTEXT}/outputs"
 
-store::basepath "${DATA_DIR}/${target}/store"
+store::basepath "${DATA_DIR}/${TFMAKE_CONTEXT}/store"
 
 store::use modules
 while IFS= read -r -d '' file; do

@@ -17,8 +17,6 @@ Usage:
 
 Options:
   -h, --help, help  Show this help output.
-  --plan            Touch modified files before 'terraform plan' execution.
-  --apply           Touch modified files before 'terraform apply' execution.
   -f, --files       List of files to touch.
 EOF
   exit
@@ -26,7 +24,6 @@ EOF
 
 [[ $# -eq 0 ]] && usage
 
-target=""
 files=""
 sep=""
 
@@ -34,9 +31,6 @@ while :; do
   case "${1-}" in
   -h|--help|help)
     usage
-    ;;
-  --plan|--apply)
-    target="${1:2}"
     ;;
   -f|--files)
     files+="${sep}${2-}"
@@ -55,20 +49,16 @@ while :; do
 done
 
 # validations
-if [[ -z "${target}" ]]; then
-  printf ">>> Missing '--plan' or '--apply' option.\n"
-  exit 1
-fi
-
 file::exist_condition \
-  "${DATA_DIR}/${target}/store/modules/keys" \
-  "tfmake init --${target}"
+  "${DATA_DIR}/${TFMAKE_CONTEXT}/store/modules/keys" \
+  "tfmake init"
 
 if [[ -z ${files} ]]; then
   printf ">>> No files, anything to do.\n"
 fi
 
-store::basepath "${DATA_DIR}/${target}/store"
+# subcommand
+store::basepath "${DATA_DIR}/${TFMAKE_CONTEXT}/store"
 store::use modules
 
 modules=$(utils::splitlines "$(kv::keys)")

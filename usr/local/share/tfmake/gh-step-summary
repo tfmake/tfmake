@@ -17,27 +17,19 @@ Usage:
 
 Options:
   -h, --help, help  Show this help output.
-  --plan            Use the outputs from 'tfmake summary --plan'.
-  --apply           Use the outputs from 'tfmake summary --apply'.
 EOF
   exit
 }
 
-target=""
-option="${1-}"
-shift
-
-case "${option}" in
+case "${1-}" in
 -h|--help|help)
   usage
   ;;
---plan|--apply)
-  target="${option:2}"
-  ;;
-*)
+?*)
+  printf ">>> Unknown option: %s\n\n" "${1}"
   usage
   ;;
 esac
 
 GITHUB_STEP_SUMMARY=${GITHUB_STEP_SUMMARY:-"/dev/null"}
-cat "${DATA_DIR}/${target}/outputs/summary.md" >> "${GITHUB_STEP_SUMMARY}"
+cat "${DATA_DIR}/${TFMAKE_CONTEXT}/outputs/summary.md" >> "${GITHUB_STEP_SUMMARY}"

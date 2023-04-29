@@ -11,13 +11,13 @@ set -u
 function usage() {
   cat << EOF
 Usage:
-  tfmake apply [options]
+  tfmake run [options]
 
-  This command execute the apply Makefile.
+  This command run the Terraform plan/apply Makefile.
 
 Options:
   -h, --help, help  Show this help output.
-  --all             Execute the apply Makefile for all modules.
+  --all             Execute the plan/apply Makefile for all modules.
   --dry-run         Print the modules that would be executed, but don't execute them.
 EOF
   exit
@@ -25,51 +25,47 @@ EOF
 
 mode="default"
 
-while :; do
-  case "${1-}" in
-  -h|--help)
-    usage
-    ;;
-  --all)
-    mode="all"
-    ;;
-  --dry-run)
-    mode="dry-run"
-    ;;
-  ?*)
-    printf ">>> Unknown option: %s\n\n" "${1}"
-    usage
-    ;;
-  *)
-    break
-    ;;
-  esac
-  shift
-done
+case "${1-}" in
+-h|--help)
+  usage
+  ;;
+--all)
+  mode="all"
+  ;;
+--dry-run)
+  mode="dry-run"
+  ;;
+?*)
+  printf ">>> Unknown option: %s\n\n" "${1}"
+  usage
+  ;;
+esac
 
+# validations
 file::exist_condition \
-  "${DATA_DIR}/apply/Makefile" \
-  "tfmake makefile --apply"
+  "${DATA_DIR}/${TFMAKE_CONTEXT}/Makefile" \
+  "tfmake makefile"
 
-truncate -s 0 "${DATA_DIR}/apply/outputs/visited"
+# subcommand
+truncate -s 0 "${DATA_DIR}/${TFMAKE_CONTEXT}/outputs/visited"
 
 export TF_IN_AUTOMATION=true
 
-store::basepath "${DATA_DIR}/apply/store"
+store::basepath "${DATA_DIR}/${TFMAKE_CONTEXT}/store"
 
 # "default" mode
 if [[ "${mode}" == "default" ]]; then
-  make -i -r -R -f "${DATA_DIR}/apply/Makefile" 2> "${DATA_DIR}/apply/logs/signpost.log"
+  make -i -r -R -f "${DATA_DIR}/${TFMAKE_CONTEXT}/Makefile" 2> "${DATA_DIR}/${TFMAKE_CONTEXT}/logs/signpost.log"
 fi
 
 # "all" is useful for drift detection; 'tfmake touch' is not needed.
 if [[ "${mode}" == "all" ]]; then
-  make -B -i -r -R -f "${DATA_DIR}/apply/Makefile" 2> "${DATA_DIR}/apply/logs/signpost.log"
+  make -B -i -r -R -f "${DATA_DIR}/${TFMAKE_CONTEXT}/Makefile" 2> "${DATA_DIR}/${TFMAKE_CONTEXT}/logs/signpost.log"
 fi
 
 # "dry-run" print the modules that would be executed, but don't execute them.
 if [[ "${mode}" == "dry-run" ]]; then
-  make -t -r -R -f "${DATA_DIR}/apply/Makefile" | awk '/^touch/ {print $2}'
+  make -t -r -R -f "${DATA_DIR}/${TFMAKE_CONTEXT}/Makefile" | awk '/^touch/ {print $2}'
 
   # As 'make -t' touch files and fool future invocations; the next calls to 'touch'
   # aim to prevent that behavior.
@@ -88,20 +84,20 @@ fi
 # look for errors and exit properly
 exit_code=0
 
-if [[ -f "${DATA_DIR}/apply/outputs/visited" ]]; then
-  nodes=$(cat "${DATA_DIR}/apply/outputs/visited")
+if [[ -f "${DATA_DIR}/${TFMAKE_CONTEXT}/outputs/visited" ]]; then
+  nodes=$(cat "${DATA_DIR}/${TFMAKE_CONTEXT}/outputs/visited")
 
   store::use visited
   for node in ${nodes}; do
     value=true
 
-    grep -qE "make: \[.*${node}\] Error .+" "${DATA_DIR}/apply/logs/signpost.log"
+    grep -qE "make: \[.*${node}\] Error .+" "${DATA_DIR}/${TFMAKE_CONTEXT}/logs/signpost.log"
     [[ $? -eq 0 ]] && value=false && exit_code=1
 
     kv::set "${node}" "${value}"
   done
 fi
 
-rm -f "${DATA_DIR}/apply/outputs/visited"
+rm -f "${DATA_DIR}/${TFMAKE_CONTEXT}/outputs/visited"
 
 exit "${exit_code}"

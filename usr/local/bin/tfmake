@@ -7,30 +7,52 @@ VERSION="0.1.0"
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 export SCRIPT_DIR
 
+# shellcheck source=/dev/null
+{
+  source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
+  source "${SCRIPT_DIR}/../include/tfmake/store.sh"
+}
+
 function usage() {
   cat << EOF
 Usage:
   tfmake command [options] [args]
 
 Available Commands:
-  apply             Execute the apply Makefile.
   cleanup           Cleanup the data directory.
   config            Modify tfmake configuration.
-  gh-pr-comment     Add a comment to a GitHub pull request.
-  gh-step-summary   Add content to GitHub Step Summary.
-  init              Initialize the data directory for Terraform plan or apply execution.
-  makefile          Generate a Makefile for Terraform plan or apply execution.
+  context           An alias for 'tfmake config' over the context value.
+  init              Initialize the data directory for Terraform plan/apply execution.
+  makefile          Generate a Makefile for Terraform plan/apply execution.
   mermaid           Generate a Mermaid flowchart diagram from Terraform modules and their dependencies.
-  plan              Execute the plan Makefile.
+  run               Run the Terraform plan/apply Makefile.
   summary           Create a Markdown summary.
   touch             Touch modified files.
   version           Show the current version.
+
+GitHub Commands:
+  gh-pr-comment     Add a comment to a GitHub pull request.
+  gh-step-summary   Add content to GitHub Step Summary.
 
 Other options:
   -h, --help, help  Print this help and exit.
   -v, --version     An alias for the "version" subcommand.
 EOF
   exit
+}
+
+function context() {
+  file::exist_condition \
+    "${DATA_DIR}/global/store/config/keys" \
+    "tfmake config --set context <plan|apply>"
+
+  store::basepath "${DATA_DIR}/global/store"
+  store::use config
+
+  TFMAKE_CONTEXT=$(kv::get context)
+  validate::context "${TFMAKE_CONTEXT}"
+
+  export TFMAKE_CONTEXT
 }
 
 [[ $# -eq 0 ]] && usage
@@ -46,17 +68,10 @@ case "${CMD}" in
   echo "tfmake v${VERSION}"
   exit
   ;;
-apply|cleanup|config|gh-pr-comment|gh-step-summary|mermaid|init|plan|summary|touch)
+config|context)
   ;;
-makefile)
-  tmp="${CMD}-help"
-
-  if [[ "${1-}" == "--plan" || "${1-}" == "--apply" ]]; then
-    tmp="${CMD}-${1:2}"
-    shift
-  fi
-
-  CMD="${tmp}"
+cleanup|gh-pr-comment|gh-step-summary|makefile|mermaid|init|run|summary|touch)
+  context
   ;;
 *)
   usage
@@ -64,5 +79,4 @@ makefile)
 esac
 
 SCRIPT_PATH="${SCRIPT_DIR}/../share/tfmake/${CMD}"
-
 exec "bash" "${SCRIPT_PATH}" "$@"

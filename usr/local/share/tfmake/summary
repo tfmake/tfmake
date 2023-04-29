@@ -17,66 +17,48 @@ Usage:
 
 Options:
   -h, --help, help  Show this help output.
-  --plan            Create the summary using 'tfmake plan' outputs.
-  --apply           Create the summary using 'tfmake apply' outputs.
   --no-diagram      The summary won't contain the Mermaid flowchart diagram.
   --no-outputs      The summary won't contain the Terraform outputs.
 EOF
   exit
 }
 
-[[ $# -eq 0 ]] && usage
-
-target=""
 with_diagram=true
 with_outputs=true
 
-while :; do
-  case "${1-}" in
-  -h|--help|help)
-    usage
-    ;;
-  --plan|--apply)
-    target="${1:2}"
-    ;;
-  --no-diagram)
-    with_diagram=false
-    ;;
-  --no-outputs)
-    with_outputs=false
-    ;;
-  ?*)
-    printf ">>> Unknown option: %s\n\n" "${1}"
-    usage
-    ;;
-  *)
-    break
-    ;;
-  esac
-  shift
-done
-
-MERMAID_FILE="${DATA_DIR}/${target}/outputs/mermaid.md"
-SUMMARY_TITLE="${SUMMARY_TITLE:-"${target^}"}"
-SUMMARY_FILE="${DATA_DIR}/${target}/outputs/summary.md"
-BREADCRUMBS_FILE="${DATA_DIR}/${target}/outputs/breadcrumbs"
+case "${1-}" in
+-h|--help|help)
+  usage
+  ;;
+--no-diagram)
+  with_diagram=false
+  ;;
+--no-outputs)
+  with_outputs=false
+  ;;
+?*)
+  printf ">>> Unknown option: %s\n\n" "${1}"
+  usage
+  ;;
+esac
 
 # validations
-if [[ -z "${target}" ]]; then
-  printf ">>> Missing '--plan' or '--apply' option.\n"
-  exit 1
-fi
+MERMAID_FILE="${DATA_DIR}/${TFMAKE_CONTEXT}/outputs/mermaid.md"
+SUMMARY_TITLE="${SUMMARY_TITLE:-"${TFMAKE_CONTEXT^}"}"
+SUMMARY_FILE="${DATA_DIR}/${TFMAKE_CONTEXT}/outputs/summary.md"
+BREADCRUMBS_FILE="${DATA_DIR}/${TFMAKE_CONTEXT}/outputs/breadcrumbs"
 
 file::exist_condition \
-  "${DATA_DIR}/${target}/store/visited/keys" \
-  "tfmake ${target}"
+  "${DATA_DIR}/${TFMAKE_CONTEXT}/store/visited/keys" \
+  "tfmake run"
 
 if [[ "${with_diagram}" == "true" ]]; then
   file::exist_condition \
-    "${DATA_DIR}/${target}/outputs/mermaid.md" \
-    "tfmake mermaid --${target}"
+    "${DATA_DIR}/${TFMAKE_CONTEXT}/outputs/mermaid.md" \
+    "tfmake mermaid"
 fi
 
+# subcommand
 function breadcrumb() {
   bytes=$(wc -c "${SUMMARY_FILE}" | awk '{print $1}')
 
@@ -108,7 +90,7 @@ fi
 
 # outputs
 if [[ "${with_outputs}" == "true" ]]; then
-  store::basepath "${DATA_DIR}/${target}/store"
+  store::basepath "${DATA_DIR}/${TFMAKE_CONTEXT}/store"
 
   store::use visited
   nodes=$(kv::keys)
@@ -119,11 +101,11 @@ if [[ "${with_outputs}" == "true" ]]; then
 <summary>Module <strong>"${node}"</strong></summary>
 
 ${BACKTICKS}
-$(cat "${DATA_DIR}/${target}/logs/${node}/init.log")
+$(cat "${DATA_DIR}/${TFMAKE_CONTEXT}/logs/${node}/init.log")
 
 --------------------------------------------------------------------------------
 
-$(cat "${DATA_DIR}/${target}/logs/${node}/${target}.log")
+$(cat "${DATA_DIR}/${TFMAKE_CONTEXT}/logs/${node}/${TFMAKE_CONTEXT}.log")
 ${BACKTICKS}
 
 </details>

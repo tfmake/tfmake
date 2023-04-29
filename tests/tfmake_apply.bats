@@ -10,17 +10,21 @@ setup() {
   cd_terraform_modules_path
 }
 
+@test "tfmake config" {
+  bash tfmake config --set context apply
+}
+
 @test "tfmake cleanup" {
-  bash tfmake cleanup --apply
+  bash tfmake cleanup
 }
 
 @test "tfmake makefile (before init)" {
-  run bash tfmake makefile --apply
-  assert_output ">>> Run 'tfmake init --apply' first."
+  run bash tfmake makefile
+  assert_output ">>> Run 'tfmake init' first."
 }
 
 @test "tfmake init" {
-  bash tfmake init --apply
+  bash tfmake init
 
   # directory structure
   assert_dir_exist ".tfmake"
@@ -50,28 +54,28 @@ setup() {
   assert_output A
 }
 
-@test "tfmake apply (before makefile)" {
-  run bash tfmake apply
-  assert_output ">>> Run 'tfmake makefile --apply' first."
+@test "tfmake run (before makefile)" {
+  run bash tfmake run
+  assert_output ">>> Run 'tfmake makefile' first."
 }
 
 @test "tfmake makefile" {
-  bash tfmake makefile --apply
+  bash tfmake makefile
   assert_file_exist ".tfmake/apply/Makefile"
 }
 
-@test "tfmake mermaid (before apply)" {
-  run bash tfmake mermaid --apply
-  assert_output ">>> Run 'tfmake apply' first."
+@test "tfmake mermaid (before run)" {
+  run bash tfmake mermaid
+  assert_output ">>> Run 'tfmake run' first."
 }
 
-@test "tfmake summary (before apply)" {
-  run bash tfmake summary --apply --no-diagram
-  assert_output ">>> Run 'tfmake apply' first."
+@test "tfmake summary (before run)" {
+  run bash tfmake summary --no-diagram
+  assert_output ">>> Run 'tfmake run' first."
 }
 
 @test "tfmake touch" {
-  bash tfmake touch --apply -f "A/main.tf A/terraform.tfvars"
+  bash tfmake touch -f "A/main.tf A/terraform.tfvars"
 
   # kv store
   store::basepath .tfmake/apply/store
@@ -82,7 +86,7 @@ setup() {
 }
 
 @test "tfmake touch (repeated -f)" {
-  bash tfmake touch --apply -f A/main.tf -f A/terraform.tfvars
+  bash tfmake touch -f A/main.tf -f A/terraform.tfvars
 
   # kv store
   store::basepath .tfmake/apply/store
@@ -92,8 +96,8 @@ setup() {
   assert_output "A/main.tf A/terraform.tfvars"
 }
 
-@test "tfmake apply" {
-  bash tfmake apply > /dev/null
+@test "tfmake run" {
+  bash tfmake run > /dev/null
 
   # kv store
   store::basepath .tfmake/apply/store
@@ -110,13 +114,13 @@ setup() {
   done
 }
 
-@test "tfmake apply (second time)" {
-  run bash tfmake apply > /dev/null
-  assert_output --partial "make: Nothing to be done for" 
+@test "tfmake run (second time)" {
+  run bash tfmake run > /dev/null
+  assert_output --partial "make: Nothing to be done for"
 }
 
-@test "tfmake apply (all)" {
-  bash tfmake apply --all > /dev/null
+@test "tfmake run (all)" {
+  bash tfmake run --all > /dev/null
 
   # kv store
   store::basepath .tfmake/apply/store
@@ -133,62 +137,57 @@ setup() {
   done
 }
 
-@test "tfmake apply (dry run)" {
-  bash tfmake touch --apply -f A/main.tf
-  run bash tfmake apply --dry-run
+@test "tfmake run (dry run)" {
+  bash tfmake touch -f A/main.tf
+  run bash tfmake run --dry-run
   assert_output - << EOF
 A
 B
 EOF
 
-  bash tfmake touch --apply -f B/main.tf
-  run bash tfmake apply --dry-run
+  bash tfmake touch -f B/main.tf
+  run bash tfmake run --dry-run
   assert_output B
 }
 
 @test "tfmake summary (before mermaid)" {
-  run bash tfmake summary --apply
-  assert_output ">>> Run 'tfmake mermaid --apply' first."
+  run bash tfmake summary
+  assert_output ">>> Run 'tfmake mermaid' first."
 }
 
 @test "tfmake gh-pr-comment (before summary)" {
-  run bash tfmake gh-pr-comment --apply --number 1 --dry-run
-  assert_output ">>> Run 'tfmake summary --apply' first."
+  run bash tfmake gh-pr-comment --number 1 --dry-run
+  assert_output ">>> Run 'tfmake summary' first."
 }
 
 @test "tfmake summary (without mermaid)" {
-  run bash tfmake summary --apply --no-diagram
+  run bash tfmake summary --no-diagram
   assert_file_exist ".tfmake/apply/outputs/summary.md"
 }
 
 @test "tfmake mermaid" {
-  bash tfmake mermaid --apply
+  bash tfmake mermaid
   assert_file_exist ".tfmake/apply/outputs/mermaid.md"
 }
 
 @test "tfmake summary" {
-  bash tfmake summary --apply
+  bash tfmake summary
   assert_file_exist ".tfmake/apply/outputs/summary.md"
 }
 
 @test "tfmake summary (without outputs)" {
-  run bash tfmake summary --apply --no-outputs
+  run bash tfmake summary --no-outputs
   assert_file_exist ".tfmake/apply/outputs/summary.md"
 }
 
 @test "tfmake summary (title)" {
   export SUMMARY_TITLE="Basic Project Apply"
-  bash tfmake summary --apply
+  bash tfmake summary
   assert_file_contains ".tfmake/apply/outputs/summary.md" "${SUMMARY_TITLE}"
 }
 
-@test "tfmake gh-pr-comment (no --plan/--apply)" {
-  run bash tfmake gh-pr-comment --number 1
-  assert_output ">>> Missing '--plan' or '--apply' option."
-}
-
 @test "tfmake gh-pr-comment (no --number)" {
-  run bash tfmake gh-pr-comment --apply
+  run bash tfmake gh-pr-comment
   assert_output ">>> Missing '--number' option."
 }
 
@@ -196,7 +195,7 @@ EOF
   size=$(wc -c ".tfmake/apply/outputs/summary.md" | awk '{print $1-1}')
   export MAX_COMMENT_SIZE=${size}
 
-  run bash tfmake gh-pr-comment --apply --dry-run
+  run bash tfmake gh-pr-comment --dry-run
   assert_file_exist ".tfmake/apply/outputs/fragment-0.md"
   assert_file_exist ".tfmake/apply/outputs/fragment-1.md"
 }

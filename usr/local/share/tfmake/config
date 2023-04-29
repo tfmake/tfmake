@@ -29,32 +29,26 @@ action=""
 key=""
 value=""
 
-while :; do
-  case "${1-}" in
-  -h|--help|help)
-    usage
-    ;;
-  --set)
-    action="set"
-    key="${2-}"
-    value="${3-}"
-    shift 2
-    ;;
-  --get)
-    action="get"
-    key="${2-}"
-    shift
-    ;;
-  ?*)
-    printf ">>> Unknown option: %s\n\n" "${1}"
-    usage
-    ;;
-  *)
-    break
-    ;;
-  esac
+case "${1-}" in
+-h|--help|help)
+  usage
+  ;;
+--set)
+  action="set"
+  key="${2-}"
+  value="${3-}"
+  shift 2
+  ;;
+--get)
+  action="get"
+  key="${2-}"
   shift
-done
+  ;;
+?*)
+  printf ">>> Unknown option: %s\n\n" "${1}"
+  usage
+  ;;
+esac
 
 store::basepath "${DATA_DIR}/global/store"
 store::use config
@@ -67,7 +61,7 @@ if [[ "${action}" == "set" ]]; then
   fi
 
   if [[ -z "${value}" ]]; then
-    log::err ">>> Missing config value."
+    log::err ">>> Missing config value for '${key}' key."
   fi
 
   kv::set "${key}" "${value}"

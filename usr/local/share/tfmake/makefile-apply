@@ -12,7 +12,7 @@ tab=$(printf '\t')
 
 file::exist_condition \
   "${DATA_DIR}/apply/store/dependencies/keys" \
-  "tfmake init --apply"
+  "tfmake init"
 
 store::basepath "${DATA_DIR}/apply/store"
 
