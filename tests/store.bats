@@ -86,6 +86,6 @@ EOF
   run kv::set b 2
   run kv::set c 3
 
-  run utils::splitlines "$(kv::keys)"
+  run util::splitlines "$(kv::keys)"
   assert_output "a b c"
 }

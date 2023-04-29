@@ -4,8 +4,8 @@ set -u
 
 # shellcheck source=/dev/null
 {
-  source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
-  source "${SCRIPT_DIR}/../include/tfmake/store.sh"
+  source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/util.sh"
+  source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/store.sh"
 }
 
 function usage() {
@@ -42,30 +42,30 @@ case "${1-}" in
 esac
 
 # validations
-file::exist_condition \
-  "${DATA_DIR}/${TFMAKE_CONTEXT}/Makefile" \
+util::file_exist_condition \
+  "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/Makefile" \
   "tfmake makefile"
 
 # subcommand
-truncate -s 0 "${DATA_DIR}/${TFMAKE_CONTEXT}/outputs/visited"
+truncate -s 0 "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/outputs/visited"
 
 export TF_IN_AUTOMATION=true
 
-store::basepath "${DATA_DIR}/${TFMAKE_CONTEXT}/store"
+store::basepath "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/store"
 
 # "default" mode
 if [[ "${mode}" == "default" ]]; then
-  make -i -r -R -f "${DATA_DIR}/${TFMAKE_CONTEXT}/Makefile" 2> "${DATA_DIR}/${TFMAKE_CONTEXT}/logs/signpost.log"
+  make -i -r -R -f "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/Makefile" 2> "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/logs/signpost.log"
 fi
 
 # "all" is useful for drift detection; 'tfmake touch' is not needed.
 if [[ "${mode}" == "all" ]]; then
-  make -B -i -r -R -f "${DATA_DIR}/${TFMAKE_CONTEXT}/Makefile" 2> "${DATA_DIR}/${TFMAKE_CONTEXT}/logs/signpost.log"
+  make -B -i -r -R -f "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/Makefile" 2> "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/logs/signpost.log"
 fi
 
 # "dry-run" print the modules that would be executed, but don't execute them.
 if [[ "${mode}" == "dry-run" ]]; then
-  make -t -r -R -f "${DATA_DIR}/${TFMAKE_CONTEXT}/Makefile" | awk '/^touch/ {print $2}'
+  make -t -r -R -f "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/Makefile" | awk '/^touch/ {print $2}'
 
   # As 'make -t' touch files and fool future invocations; the next calls to 'touch'
   # aim to prevent that behavior.
@@ -75,7 +75,7 @@ if [[ "${mode}" == "dry-run" ]]; then
 
   store::use modified
 
-  files=$(utils::splitlines "$(kv::keys)")
+  files=$(util::splitlines "$(kv::keys)")
   for file in ${files}; do
     touch -c -m "${file}"
   done
@@ -84,20 +84,20 @@ fi
 # look for errors and exit properly
 exit_code=0
 
-if [[ -f "${DATA_DIR}/${TFMAKE_CONTEXT}/outputs/visited" ]]; then
-  nodes=$(cat "${DATA_DIR}/${TFMAKE_CONTEXT}/outputs/visited")
+if [[ -f "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/outputs/visited" ]]; then
+  nodes=$(cat "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/outputs/visited")
 
   store::use visited
   for node in ${nodes}; do
     value=true
 
-    grep -qE "make: \[.*${node}\] Error .+" "${DATA_DIR}/${TFMAKE_CONTEXT}/logs/signpost.log"
+    grep -qE "make: \[.*${node}\] Error .+" "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/logs/signpost.log"
     [[ $? -eq 0 ]] && value=false && exit_code=1
 
     kv::set "${node}" "${value}"
   done
 fi
 
-rm -f "${DATA_DIR}/${TFMAKE_CONTEXT}/outputs/visited"
+rm -f "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/outputs/visited"
 
 exit "${exit_code}"

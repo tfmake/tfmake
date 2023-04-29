@@ -4,8 +4,8 @@ set -u
 
 # shellcheck source=/dev/null
 {
-  source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
-  source "${SCRIPT_DIR}/../include/tfmake/store.sh"
+  source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/util.sh"
+  source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/store.sh"
 }
 
 function usage() {
@@ -31,5 +31,5 @@ case "${1-}" in
   ;;
 esac
 
-SCRIPT_PATH="${SCRIPT_DIR}/../share/tfmake/makefile-${TFMAKE_CONTEXT}"
+SCRIPT_PATH="${TFMAKE_SCRIPT_DIR}/../share/tfmake/makefile-${TFMAKE_CONTEXT}"
 exec "bash" "${SCRIPT_PATH}" "$@"

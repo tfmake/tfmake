@@ -11,7 +11,7 @@ setup() {
 }
 
 @test "tfmake config" {
-  bash tfmake config --set context apply
+  bash tfmake context apply
 }
 
 @test "tfmake cleanup" {
@@ -81,7 +81,7 @@ setup() {
   store::basepath .tfmake/apply/store
   store::use modified
 
-  run utils::splitlines "$(kv::keys)"
+  run util::splitlines "$(kv::keys)"
   assert_output "A/main.tf A/terraform.tfvars"
 }
 
@@ -92,7 +92,7 @@ setup() {
   store::basepath .tfmake/apply/store
   store::use modified
 
-  run utils::splitlines "$(kv::keys)"
+  run util::splitlines "$(kv::keys)"
   assert_output "A/main.tf A/terraform.tfvars"
 }
 
@@ -104,11 +104,11 @@ setup() {
 
   store::use visited
 
-  run utils::splitlines "$(kv::keys)"
+  run util::splitlines "$(kv::keys)"
   assert_output "A B"
 
   # terraform logs
-  for key in $(utils::splitlines "$(kv::keys)"); do
+  for key in $(util::splitlines "$(kv::keys)"); do
     assert_file_exist ".tfmake/apply/logs/${key}/init.log"
     assert_file_exist ".tfmake/apply/logs/${key}/apply.log"
   done
@@ -127,11 +127,11 @@ setup() {
 
   store::use visited
 
-  run utils::splitlines "$(kv::keys)"
+  run util::splitlines "$(kv::keys)"
   assert_output "A B"
 
   # terraform logs
-  for key in $(utils::splitlines "$(kv::keys)"); do
+  for key in $(util::splitlines "$(kv::keys)"); do
     assert_file_exist ".tfmake/apply/logs/${key}/init.log"
     assert_file_exist ".tfmake/apply/logs/${key}/apply.log"
   done

@@ -4,13 +4,13 @@ set -Eeuo pipefail
 
 VERSION="0.1.0"
 
-SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
-export SCRIPT_DIR
+TFMAKE_SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
+export TFMAKE_SCRIPT_DIR
 
 # shellcheck source=/dev/null
 {
-  source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
-  source "${SCRIPT_DIR}/../include/tfmake/store.sh"
+  source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/util.sh"
+  source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/store.sh"
 }
 
 function usage() {
@@ -42,15 +42,11 @@ EOF
 }
 
 function context() {
-  file::exist_condition \
-    "${DATA_DIR}/global/store/config/keys" \
-    "tfmake config --set context <plan|apply>"
-
-  store::basepath "${DATA_DIR}/global/store"
+  store::basepath "${TFMAKE_DATA_DIR}/global/store"
   store::use config
 
   TFMAKE_CONTEXT=$(kv::get context)
-  validate::context "${TFMAKE_CONTEXT}"
+  util::validate_context "${TFMAKE_CONTEXT}"
 
   export TFMAKE_CONTEXT
 }
@@ -78,5 +74,5 @@ cleanup|gh-pr-comment|gh-step-summary|makefile|mermaid|init|run|summary|touch)
   ;;
 esac
 
-SCRIPT_PATH="${SCRIPT_DIR}/../share/tfmake/${CMD}"
+SCRIPT_PATH="${TFMAKE_SCRIPT_DIR}/../share/tfmake/${CMD}"
 exec "bash" "${SCRIPT_PATH}" "$@"

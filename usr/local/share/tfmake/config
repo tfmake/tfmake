@@ -4,8 +4,8 @@ set -u
 
 # shellcheck source=/dev/null
 {
-  source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
-  source "${SCRIPT_DIR}/../include/tfmake/store.sh"
+  source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/util.sh"
+  source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/store.sh"
 }
 
 function usage() {
@@ -50,18 +50,18 @@ case "${1-}" in
   ;;
 esac
 
-store::basepath "${DATA_DIR}/global/store"
+store::basepath "${TFMAKE_DATA_DIR}/global/store"
 store::use config
 
 # set a config value
 if [[ "${action}" == "set" ]]; then
   # validation
   if [[ -z "${key}" ]]; then
-    log::err ">>> Missing config key."
+    util::log_err ">>> Missing config key."
   fi
 
   if [[ -z "${value}" ]]; then
-    log::err ">>> Missing config value for '${key}' key."
+    util::log_err ">>> Missing config value for '${key}' key."
   fi
 
   kv::set "${key}" "${value}"
@@ -72,7 +72,7 @@ fi
 if [[ "${action}" == "get" ]]; then
   # validation
   if [[ -z "${key}" ]]; then
-    log::err ">>> Missing config key."
+    util::log_err ">>> Missing config key."
   fi
 
   kv::get "${key}"

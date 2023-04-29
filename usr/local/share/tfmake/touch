@@ -4,8 +4,8 @@ set -u
 
 # shellcheck source=/dev/null
 {
-  source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
-  source "${SCRIPT_DIR}/../include/tfmake/store.sh"
+  source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/util.sh"
+  source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/store.sh"
 }
 
 function usage() {
@@ -49,8 +49,8 @@ while :; do
 done
 
 # validations
-file::exist_condition \
-  "${DATA_DIR}/${TFMAKE_CONTEXT}/store/modules/keys" \
+util::file_exist_condition \
+  "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/store/modules/keys" \
   "tfmake init"
 
 if [[ -z ${files} ]]; then
@@ -58,10 +58,10 @@ if [[ -z ${files} ]]; then
 fi
 
 # subcommand
-store::basepath "${DATA_DIR}/${TFMAKE_CONTEXT}/store"
+store::basepath "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/store"
 store::use modules
 
-modules=$(utils::splitlines "$(kv::keys)")
+modules=$(util::splitlines "$(kv::keys)")
 
 # Set the same time in all directories before touch individual files.
 mtime=$(date +%Y%m%d%H%M.%S)

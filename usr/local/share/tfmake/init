@@ -4,8 +4,8 @@ set -u
 
 # shellcheck source=/dev/null
 {
-  source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
-  source "${SCRIPT_DIR}/../include/tfmake/store.sh"
+  source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/util.sh"
+  source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/store.sh"
 }
 
 function usage() {
@@ -31,10 +31,10 @@ case "${1-}" in
   ;;
 esac
 
-mkdir -p "${DATA_DIR}/${TFMAKE_CONTEXT}/logs"
-mkdir -p "${DATA_DIR}/${TFMAKE_CONTEXT}/outputs"
+mkdir -p "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/logs"
+mkdir -p "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/outputs"
 
-store::basepath "${DATA_DIR}/${TFMAKE_CONTEXT}/store"
+store::basepath "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/store"
 
 store::use modules
 while IFS= read -r -d '' file; do

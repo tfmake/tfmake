@@ -6,23 +6,23 @@ tab=$(printf '\t')
 
 # shellcheck source=/dev/null
 {
-  source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
-  source "${SCRIPT_DIR}/../include/tfmake/store.sh"
+  source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/util.sh"
+  source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/store.sh"
 }
 
-file::exist_condition \
-  "${DATA_DIR}/plan/store/dependencies/keys" \
+util::file_exist_condition \
+  "${TFMAKE_DATA_DIR}/plan/store/dependencies/keys" \
   "tfmake init"
 
-store::basepath "${DATA_DIR}/plan/store"
+store::basepath "${TFMAKE_DATA_DIR}/plan/store"
 
 store::use modules
 modules=$(kv::keys)
 
-cat > "${DATA_DIR}/plan/Makefile" << EOF
+cat > "${TFMAKE_DATA_DIR}/plan/Makefile" << EOF
 SHELL=$(which bash) -o pipefail
 
-all: $(utils::splitlines "${modules}")
+all: $(util::splitlines "${modules}")
 EOF
 
 store::use dependencies
@@ -30,13 +30,13 @@ for module in ${modules}; do
   deps=$(kv::get "${module}")
   [[ -n ${deps} ]] && deps=${deps//,/ }
 
-  file::new_line "${DATA_DIR}/plan/Makefile"
+  util::append_new_line "${TFMAKE_DATA_DIR}/plan/Makefile"
 
-  cat >> "${DATA_DIR}/plan/Makefile" << EOF
+  cat >> "${TFMAKE_DATA_DIR}/plan/Makefile" << EOF
 ${module}: \$(wildcard ${module}/*.tf ${module}/*.tfvars) ${deps}
-${tab}@mkdir -p "${DATA_DIR}/plan/logs/${module}"
-${tab}@echo "${module}" >> "${DATA_DIR}/plan/outputs/visited"
-${tab}terraform -chdir="${module}" init -no-color 2>&1 | tee "${DATA_DIR}/plan/logs/${module}/init.log"
-${tab}terraform -chdir="${module}" plan -no-color 2>&1 | tee "${DATA_DIR}/plan/logs/${module}/plan.log"
+${tab}@mkdir -p "${TFMAKE_DATA_DIR}/plan/logs/${module}"
+${tab}@echo "${module}" >> "${TFMAKE_DATA_DIR}/plan/outputs/visited"
+${tab}terraform -chdir="${module}" init -no-color 2>&1 | tee "${TFMAKE_DATA_DIR}/plan/logs/${module}/init.log"
+${tab}terraform -chdir="${module}" plan -no-color 2>&1 | tee "${TFMAKE_DATA_DIR}/plan/logs/${module}/plan.log"
 EOF
 done

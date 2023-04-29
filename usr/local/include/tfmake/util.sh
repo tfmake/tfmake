@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-DATA_DIR="${DATA_DIR:-".tfmake"}"
+TFMAKE_DATA_DIR="${TFMAKE_DATA_DIR:-".tfmake"}"
 
 # shellcheck disable=SC2034,SC2155
 {
@@ -8,28 +8,32 @@ DATA_DIR="${DATA_DIR:-".tfmake"}"
   BACKTICKS='```'
 }
 
-function log::err() {
+function util::log_err() {
   echo "${1}" >&2
   exit 1
 }
 
-function utils::splitlines() {
+function util::splitlines() {
   echo "${1}" | tr '\r\n' ' ' | xargs
 }
 
-function file::new_line() {
+function util::append_new_line() {
   printf "\n" >> "${1}"
 }
 
-function file::exist_condition () {
+function util::file_exist_condition () {
   file=${1}; command=${2};
 
   if [[ ! -f ${file} ]]; then
-    log::err ">>> Run '${command}' first."
+    util::log_err ">>> Run '${command}' first."
   fi
 }
 
-function validate::context() {
+function util::validate_context() {
+  if [[ -z "${1-}" ]]; then
+    util::log_err ">>> Run 'tfmake context <plan|apply>' first."
+  fi
+
   if [[ ! "${1-}" =~ ^(plan|apply)$ ]]; then
     printf ">>> Invalid context: %s.\n" "${1-}"
     exit 1

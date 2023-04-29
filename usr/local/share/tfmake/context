@@ -4,8 +4,8 @@ set -u
 
 # shellcheck source=/dev/null
 {
-  source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
-  source "${SCRIPT_DIR}/../include/tfmake/store.sh"
+  source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/util.sh"
+  source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/store.sh"
 }
 
 function usage() {
@@ -23,7 +23,7 @@ EOF
   exit
 }
 
-SCRIPT_PATH="${SCRIPT_DIR}/../share/tfmake/config"
+SCRIPT_PATH="${TFMAKE_SCRIPT_DIR}/../share/tfmake/config"
 
 [[ $# -eq 0 ]] && \
   exec "bash" "${SCRIPT_PATH}" --get context

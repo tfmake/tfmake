@@ -4,8 +4,8 @@ set -u
 
 # shellcheck source=/dev/null
 {
-  source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
-  source "${SCRIPT_DIR}/../include/tfmake/store.sh"
+  source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/util.sh"
+  source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/store.sh"
 }
 
 CLASS_DEF_DEFAULT=${CLASS_DEF_DEFAULT:-"fill:#ffffff,stroke:#585c5e,color:#585c5e;"}
@@ -36,12 +36,12 @@ case "${1-}" in
 esac
 
 # validations
-file::exist_condition \
-  "${DATA_DIR}/${TFMAKE_CONTEXT}/store/visited/keys" \
+util::file_exist_condition \
+  "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/store/visited/keys" \
   "tfmake run"
 
 # subcommand
-MERMAID_FILE="${DATA_DIR}/${TFMAKE_CONTEXT}/outputs/mermaid.md"
+MERMAID_FILE="${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/outputs/mermaid.md"
 
 cat > "${MERMAID_FILE}" << EOF
 flowchart TB
@@ -51,9 +51,9 @@ classDef succeeded ${CLASS_DEF_SUCCEEDED}
 classDef failed ${CLASS_DEF_FAILED}
 EOF
 
-file::new_line "${MERMAID_FILE}"
+util::append_new_line "${MERMAID_FILE}"
 
-store::basepath "${DATA_DIR}/${TFMAKE_CONTEXT}/store"
+store::basepath "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/store"
 
 store::use modules
 modules=$(kv::keys)
@@ -73,7 +73,7 @@ for module in ${modules}; do
   done
 done
 
-file::new_line "${MERMAID_FILE}"
+util::append_new_line "${MERMAID_FILE}"
 
 store::use visited
 nodes=$(kv::keys)

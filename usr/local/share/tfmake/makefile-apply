@@ -6,23 +6,23 @@ tab=$(printf '\t')
 
 # shellcheck source=/dev/null
 {
-  source "${SCRIPT_DIR}/../include/tfmake/utils.sh"
-  source "${SCRIPT_DIR}/../include/tfmake/store.sh"
+  source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/util.sh"
+  source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/store.sh"
 }
 
-file::exist_condition \
-  "${DATA_DIR}/apply/store/dependencies/keys" \
+util::file_exist_condition \
+  "${TFMAKE_DATA_DIR}/apply/store/dependencies/keys" \
   "tfmake init"
 
-store::basepath "${DATA_DIR}/apply/store"
+store::basepath "${TFMAKE_DATA_DIR}/apply/store"
 
 store::use modules
 modules=$(kv::keys)
 
-cat > "${DATA_DIR}/apply/Makefile" << EOF
+cat > "${TFMAKE_DATA_DIR}/apply/Makefile" << EOF
 SHELL=$(which bash) -o pipefail
 
-all: $(utils::splitlines "${modules}")
+all: $(util::splitlines "${modules}")
 EOF
 
 store::use dependencies
@@ -30,13 +30,13 @@ for module in ${modules}; do
   deps=$(kv::get "${module}")
   [[ -n ${deps} ]] && deps=${deps//,/ }
 
-  file::new_line "${DATA_DIR}/apply/Makefile"
+  util::append_new_line "${TFMAKE_DATA_DIR}/apply/Makefile"
 
-  cat >> "${DATA_DIR}/apply/Makefile" << EOF
+  cat >> "${TFMAKE_DATA_DIR}/apply/Makefile" << EOF
 ${module}: \$(wildcard ${module}/*.tf ${module}/*.tfvars) ${deps}
-${tab}@mkdir -p "${DATA_DIR}/apply/logs/${module}"
-${tab}@echo "${module}" >> "${DATA_DIR}/apply/outputs/visited"
-${tab}terraform -chdir="${module}" init -no-color 2>&1 | tee "${DATA_DIR}/apply/logs/${module}/init.log"
-${tab}terraform -chdir="${module}" apply -auto-approve -no-color 2>&1 | tee "${DATA_DIR}/apply/logs/${module}/apply.log"
+${tab}@mkdir -p "${TFMAKE_DATA_DIR}/apply/logs/${module}"
+${tab}@echo "${module}" >> "${TFMAKE_DATA_DIR}/apply/outputs/visited"
+${tab}terraform -chdir="${module}" init -no-color 2>&1 | tee "${TFMAKE_DATA_DIR}/apply/logs/${module}/init.log"
+${tab}terraform -chdir="${module}" apply -auto-approve -no-color 2>&1 | tee "${TFMAKE_DATA_DIR}/apply/logs/${module}/apply.log"
 EOF
 done
