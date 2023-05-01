@@ -57,21 +57,21 @@ CMD="${1-}"
 shift
 
 case "${CMD}" in
--h|--help|help)
-  usage
-  ;;
--v|--version|version)
-  echo "tfmake v${VERSION}"
-  exit
-  ;;
-config|context)
-  ;;
-cleanup|gh-pr-comment|gh-step-summary|makefile|mermaid|init|run|summary|touch)
-  [[ ! "${1-}" =~ ^(-h|--help|help)$ ]] && context
-  ;;
-*)
-  usage
-  ;;
+  -h|--help|help)
+    usage
+    ;;
+  -v|--version|version)
+    echo "tfmake v${VERSION}"
+    exit
+    ;;
+  config|context)
+    ;;
+  cleanup|gh-pr-comment|gh-step-summary|makefile|mermaid|init|run|summary|touch)
+    [[ ! "${1-}" =~ ^(-h|--help|help)$ ]] && context
+    ;;
+  *)
+    usage
+    ;;
 esac
 
 SCRIPT_PATH="${TFMAKE_SCRIPT_DIR}/../share/tfmake/${CMD}"

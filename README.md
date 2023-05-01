@@ -3,6 +3,7 @@
 tfmake is a tool for automating Terraform with the power of make.
 
 ## Requirements
+
 - bash 4+
 - yq
 - make
@@ -70,6 +71,7 @@ run:::primary
 ### GitHub Actions commands
 
 The commands `tfmake gh-step-summary` and `tfmake gh-pr-comment` are related to GitHub Actions.
+
 ## License
 
 [MIT License](https://github.com/tfmake/tfmake/blob/main/LICENSE)

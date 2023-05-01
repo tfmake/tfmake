@@ -9,20 +9,27 @@ TFMAKE_DATA_DIR="${TFMAKE_DATA_DIR:-".tfmake"}"
 }
 
 function util::log_err() {
-  echo "${1}" >&2
+  local msg="${1-}"
+
+  echo "${msg}" >&2
   exit 1
 }
 
 function util::splitlines() {
-  echo "${1}" | tr '\r\n' ' ' | xargs
+  local lines="${1-}"
+
+  echo "${lines}" | tr '\r\n' ' ' | xargs
 }
 
 function util::append_new_line() {
-  printf "\n" >> "${1}"
+  local file="${1-}"
+
+  printf "\n" >> "${file}"
 }
 
 function util::file_exist_condition () {
-  file=${1}; command=${2};
+  local file="${1-}"
+  local command="${2-}"
 
   if [[ ! -f ${file} ]]; then
     util::log_err ">>> Run '${command}' first."
@@ -30,12 +37,13 @@ function util::file_exist_condition () {
 }
 
 function util::validate_context() {
-  if [[ -z "${1-}" ]]; then
+  local context="${1-}"
+
+  if [[ -z "${context}" ]]; then
     util::log_err ">>> Run 'tfmake context <plan|apply>' first."
   fi
 
-  if [[ ! "${1-}" =~ ^(plan|apply)$ ]]; then
-    printf ">>> Invalid context: %s.\n" "${1-}"
-    exit 1
+  if [[ ! "${context}" =~ ^(plan|apply)$ ]]; then
+    util::log_err ">>> Invalid context: ${context}"
   fi
 }

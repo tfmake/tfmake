@@ -1,16 +1,22 @@
 #!/usr/bin/env bash
 
 function hash() {
-  printf "%s" "${1}" | md5sum | cut -d' ' -f1
+  local key="${1-}"
+
+  printf "%s" "${key}" | md5sum | cut -d' ' -f1
 }
 
 function store::basepath() {
-  mkdir -p "${1}"
-  export STORE_PATH=${1}
+  local path="${1-}"
+
+  mkdir -p "${path}"
+  export STORE_PATH=${path}
 }
 
 function store::use() {
-  KV_PATH="${STORE_PATH}/${1-}"
+  local path="${1-}"
+
+  KV_PATH="${STORE_PATH}/${path}"
 
   mkdir -p "${KV_PATH}"
   touch "${KV_PATH}/keys"
@@ -19,17 +25,20 @@ function store::use() {
 }
 
 function store::truncate() {
-  KV_PATH="${STORE_PATH}/${1-}"
+  local path="${1-}"
+
+  KV_PATH="${STORE_PATH}/${path}"
 
   if [[ -d "${KV_PATH}" ]]; then
     find "${KV_PATH}" -type f -delete
   fi
 
-  store::use "${1-}"
+  store::use "${path}"
 }
 
 function kv::set() {
-  key=${1}; value=${2};
+  local key="${1-}"
+  local value="${2-}"
 
   hash=$(hash "${key}")
   printf "%s" "${value}" > "${KV_PATH}/${hash}"
@@ -41,7 +50,7 @@ function kv::set() {
 }
 
 function kv::get() {
-  key=${1}
+  local key="${1-}"
 
   hash=$(hash "${key}")
   if [[ -f "${KV_PATH}/${hash}" ]]; then

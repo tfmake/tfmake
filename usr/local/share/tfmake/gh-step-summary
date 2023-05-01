@@ -22,13 +22,13 @@ EOF
 }
 
 case "${1-}" in
--h|--help|help)
-  usage
-  ;;
-?*)
-  printf ">>> Unknown option: %s\n\n" "${1}"
-  usage
-  ;;
+  -h|--help|help)
+    usage
+    ;;
+  ?*)
+    printf ">>> Unknown option: %s\n\n" "${1}"
+    usage
+    ;;
 esac
 
 GITHUB_STEP_SUMMARY=${GITHUB_STEP_SUMMARY:-"/dev/null"}

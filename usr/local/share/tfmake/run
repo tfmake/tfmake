@@ -26,19 +26,19 @@ EOF
 mode="default"
 
 case "${1-}" in
--h|--help)
-  usage
-  ;;
---all)
-  mode="all"
-  ;;
---dry-run)
-  mode="dry-run"
-  ;;
-?*)
-  printf ">>> Unknown option: %s\n\n" "${1}"
-  usage
-  ;;
+  -h|--help)
+    usage
+    ;;
+  --all)
+    mode="all"
+    ;;
+  --dry-run)
+    mode="dry-run"
+    ;;
+  ?*)
+    printf ">>> Unknown option: %s\n\n" "${1}"
+    usage
+    ;;
 esac
 
 # validations

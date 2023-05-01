@@ -27,20 +27,20 @@ number=""
 dry_run=false
 
 case "${1-}" in
--h|--help|help)
-  usage
-  ;;
---number)
-  number=${2-}
-  shift
-  ;;
---dry-run)
-  dry_run=true
-  ;;
-?*)
-  printf ">>> Unknown option: %s\n\n" "${1}"
-  usage
-  ;;
+  -h|--help|help)
+    usage
+    ;;
+  --number)
+    number=${2-}
+    shift
+    ;;
+  --dry-run)
+    dry_run=true
+    ;;
+  ?*)
+    printf ">>> Unknown option: %s\n\n" "${1}"
+    usage
+    ;;
 esac
 
 # validations
@@ -65,7 +65,9 @@ util::file_exist_condition \
 
 # subcommand
 function add_header() {
-  cat >> "${1-}" << EOF
+  local file="${1-}"
+
+  cat >> "${file}" << EOF
 <details>
   <summary>continuation...</summary>
 
@@ -74,7 +76,9 @@ EOF
 }
 
 function add_footer() {
-  cat >> "${1-}" << EOF
+  local file="${1-}"
+
+  cat >> "${file}" << EOF
 
 ${BACKTICKS}
 </details>

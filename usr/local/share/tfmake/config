@@ -30,24 +30,24 @@ key=""
 value=""
 
 case "${1-}" in
--h|--help|help)
-  usage
-  ;;
---set)
-  action="set"
-  key="${2-}"
-  value="${3-}"
-  shift 2
-  ;;
---get)
-  action="get"
-  key="${2-}"
-  shift
-  ;;
-?*)
-  printf ">>> Unknown option: %s\n\n" "${1}"
-  usage
-  ;;
+  -h|--help|help)
+    usage
+    ;;
+  --set)
+    action="set"
+    key="${2-}"
+    value="${3-}"
+    shift 2
+    ;;
+  --get)
+    action="get"
+    key="${2-}"
+    shift
+    ;;
+  ?*)
+    printf ">>> Unknown option: %s\n\n" "${1}"
+    usage
+    ;;
 esac
 
 store::basepath "${TFMAKE_DATA_DIR}/global/store"

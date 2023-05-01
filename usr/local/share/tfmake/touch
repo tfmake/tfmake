@@ -29,21 +29,21 @@ sep=""
 
 while :; do
   case "${1-}" in
-  -h|--help|help)
-    usage
-    ;;
-  -f|--files)
-    files+="${sep}${2-}"
-    sep=" "
-    shift
-    ;;
-  ?*)
-    printf ">>> Unknown option: %s\n\n" "${1}"
-    usage
-    ;;
-  *)
-    break
-    ;;
+    -h|--help|help)
+      usage
+      ;;
+    -f|--files)
+      files+="${sep}${2-}"
+      sep=" "
+      shift
+      ;;
+    ?*)
+      printf ">>> Unknown option: %s\n\n" "${1}"
+      usage
+      ;;
+    *)
+      break
+      ;;
   esac
   shift
 done
@@ -54,7 +54,7 @@ util::file_exist_condition \
   "tfmake init"
 
 if [[ -z ${files} ]]; then
-  printf ">>> No files, anything to do.\n"
+  util::log_err ">>> No files, anything to do."
 fi
 
 # subcommand

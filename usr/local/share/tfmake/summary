@@ -27,19 +27,19 @@ with_diagram=true
 with_outputs=true
 
 case "${1-}" in
--h|--help|help)
-  usage
-  ;;
---no-diagram)
-  with_diagram=false
-  ;;
---no-outputs)
-  with_outputs=false
-  ;;
-?*)
-  printf ">>> Unknown option: %s\n\n" "${1}"
-  usage
-  ;;
+  -h|--help|help)
+    usage
+    ;;
+  --no-diagram)
+    with_diagram=false
+    ;;
+  --no-outputs)
+    with_outputs=false
+    ;;
+  ?*)
+    printf ">>> Unknown option: %s\n\n" "${1}"
+    usage
+    ;;
 esac
 
 # validations
@@ -60,9 +60,11 @@ fi
 
 # subcommand
 function breadcrumb() {
+  local section="${1-}"
+
   bytes=$(wc -c "${SUMMARY_FILE}" | awk '{print $1}')
 
-  printf "%s\t%d\n" "${1-}" "${bytes}" >> "${BREADCRUMBS_FILE}"
+  printf "%s\t%d\n" "${section}" "${bytes}" >> "${BREADCRUMBS_FILE}"
 }
 
 truncate -s 0 "${SUMMARY_FILE}" "${BREADCRUMBS_FILE}"
