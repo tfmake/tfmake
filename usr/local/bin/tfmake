@@ -67,7 +67,7 @@ case "${CMD}" in
 config|context)
   ;;
 cleanup|gh-pr-comment|gh-step-summary|makefile|mermaid|init|run|summary|touch)
-  context
+  [[ ! "${1-}" =~ ^(-h|--help|help)$ ]] && context
   ;;
 *)
   usage
