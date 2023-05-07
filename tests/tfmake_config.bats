@@ -10,12 +10,14 @@ setup() {
   cd_terraform_modules_path
 }
 
-@test "tfmake config --set" {
-  run bash tfmake config --set context plan
-  assert_output "context=plan"
+@test "tfmake config" {
+  bash tfmake config --set context plan
+  run bash tfmake config --get context
+  assert_output "plan"
 
-  run bash tfmake config --set context apply
-  assert_output "context=apply"
+  bash tfmake config --set context apply
+  run bash tfmake config --get context
+  assert_output "apply"
 }
 
 @test "tfmake config --get (missing)" {
@@ -23,8 +25,11 @@ setup() {
   assert_output ">>> Missing config key."
 }
 
-@test "tfmake config --get" {
-  bash tfmake config --set color blue
-  run bash tfmake config --get color
-  assert_output "blue"
+@test "tfmake context" {
+  bash tfmake context plan
+  run bash tfmake context
+  assert_output "plan"
+
+  run bash tfmake config --get context
+  assert_output "plan"
 }
