@@ -17,8 +17,8 @@ Usage:
 
 Options:
   -h, --help, help  Show this help output.
-  plan             Set the context value as 'plan'.
-  apply            Set the context value as 'apply'.
+  plan              Set the context value as 'plan'.
+  apply             Set the context value as 'apply'.
 EOF
   exit
 }
