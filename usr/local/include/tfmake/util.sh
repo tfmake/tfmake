@@ -65,7 +65,6 @@ function util::global_config_set() {
   store::use config
 
   kv::set "${key}" "${value}"
-  printf "%s=%s\n" "${key}" "${value}"
 }
 
 function util::global_config_get() {
