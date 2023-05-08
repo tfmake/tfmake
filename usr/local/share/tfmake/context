@@ -23,17 +23,14 @@ EOF
   exit
 }
 
-SCRIPT_PATH="${TFMAKE_SCRIPT_DIR}/../share/tfmake/config"
-
-[[ $# -eq 0 ]] && \
-  exec "bash" "${SCRIPT_PATH}" --get context
+[[ $# -eq 0 ]] && util::global_config_get context
 
 case "${1-}" in
   -h|--help|help)
     usage
     ;;
   plan|apply)
-    exec "bash" "${SCRIPT_PATH}" --set context "${1}"
+    util::global_config_set context "${1}"
     ;;
   ?*)
     printf ">>> Unknown option: %s\n\n" "${1}"

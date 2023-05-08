@@ -50,30 +50,12 @@ case "${1-}" in
     ;;
 esac
 
-store::basepath "${TFMAKE_DATA_DIR}/global/store"
-store::use config
-
 # set a config value
 if [[ "${action}" == "set" ]]; then
-  # validation
-  if [[ -z "${key}" ]]; then
-    util::log_err ">>> Missing config key."
-  fi
-
-  if [[ -z "${value}" ]]; then
-    util::log_err ">>> Missing config value for '${key}' key."
-  fi
-
-  kv::set "${key}" "${value}"
-  printf "%s=%s\n" "${key}" "${value}"
+  util::global_config_set "${key}" "${value}"
 fi
 
 # get a config value
 if [[ "${action}" == "get" ]]; then
-  # validation
-  if [[ -z "${key}" ]]; then
-    util::log_err ">>> Missing config key."
-  fi
-
-  kv::get "${key}"
+  util::global_config_get "${key}"
 fi

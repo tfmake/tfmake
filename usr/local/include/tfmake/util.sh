@@ -47,3 +47,37 @@ function util::validate_context() {
     util::log_err ">>> Invalid context: ${context}"
   fi
 }
+
+function util::global_config_set() {
+  local key="${1-}"
+  local value="${2-}"
+
+  # validation
+  if [[ -z "${key}" ]]; then
+    util::log_err ">>> Missing config key."
+  fi
+
+  if [[ -z "${value}" ]]; then
+    util::log_err ">>> Missing config value for '${key}' key."
+  fi
+
+  store::basepath "${TFMAKE_DATA_DIR}/global/store"
+  store::use config
+
+  kv::set "${key}" "${value}"
+  printf "%s=%s\n" "${key}" "${value}"
+}
+
+function util::global_config_get() {
+  local key="${1-}"
+
+  # validation
+  if [[ -z "${key}" ]]; then
+    util::log_err ">>> Missing config key."
+  fi
+
+  store::basepath "${TFMAKE_DATA_DIR}/global/store"
+  store::use config
+
+  kv::get "${key}"
+}
