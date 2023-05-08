@@ -31,5 +31,28 @@ case "${1-}" in
     ;;
 esac
 
+# validations
+util::file_exist_condition \
+  "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/store/dependencies/keys" \
+  "tfmake init"
+
+# subcommand
+readonly TFMAKE_LOG_GROUPING="${TFMAKE_LOG_GROUPING:-"true"}"
+
+# detect CI/CD platform
+TFMAKE_CICD_PLATFORM="local"
+
+if [[ "${GITHUB_ACTIONS:-}" == "true" && "${TFMAKE_LOG_GROUPING}" == "true" ]]; then
+  TFMAKE_CICD_PLATFORM="github"
+fi
+
+util::global_config_set "cicd" "${TFMAKE_CICD_PLATFORM}"
+
+# add canned recipes
+cp \
+  "${TFMAKE_SCRIPT_DIR}/../include/tfmake/recipes/${TFMAKE_CICD_PLATFORM}/grouping.mk" \
+  "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/recipes/grouping.mk"
+
+# generate Makefile
 SCRIPT_PATH="${TFMAKE_SCRIPT_DIR}/../share/tfmake/makefile-${TFMAKE_CONTEXT}"
 exec "bash" "${SCRIPT_PATH}" "$@"

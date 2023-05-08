@@ -30,7 +30,7 @@ case "${1-}" in
     usage
     ;;
   plan|apply)
-    util::global_config_set context "${1}"
+    util::global_config_set "context" "${1}"
     ;;
   ?*)
     printf ">>> Unknown option: %s\n\n" "${1}"

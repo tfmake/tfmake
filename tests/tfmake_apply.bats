@@ -10,7 +10,7 @@ setup() {
   cd_terraform_modules_path
 }
 
-@test "tfmake config" {
+@test "tfmake context" {
   bash tfmake context apply
 }
 
@@ -62,6 +62,32 @@ setup() {
 @test "tfmake makefile" {
   bash tfmake makefile
   assert_file_exist ".tfmake/apply/Makefile"
+}
+
+@test "tfmake makefile (local log grouping)" {
+  bash tfmake makefile
+
+  run util::global_config_get "cicd"
+  assert_output "local"
+}
+
+@test "tfmake makefile (github log grouping)" {
+  export GITHUB_ACTIONS=true
+
+  bash tfmake makefile
+
+  run util::global_config_get "cicd"
+  assert_output "github"
+}
+
+@test "tfmake makefile (github log grouping off)" {
+  export GITHUB_ACTIONS=true
+  export TFMAKE_LOG_GROUPING=false
+
+  bash tfmake makefile
+
+  run util::global_config_get "cicd"
+  assert_output "local"
 }
 
 @test "tfmake mermaid (before run)" {

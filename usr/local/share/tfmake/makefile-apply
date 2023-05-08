@@ -10,10 +10,6 @@ tab=$(printf '\t')
   source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/store.sh"
 }
 
-util::file_exist_condition \
-  "${TFMAKE_DATA_DIR}/apply/store/dependencies/keys" \
-  "tfmake init"
-
 store::basepath "${TFMAKE_DATA_DIR}/apply/store"
 
 store::use modules
@@ -21,6 +17,9 @@ modules=$(kv::keys)
 
 cat > "${TFMAKE_DATA_DIR}/apply/Makefile" << EOF
 SHELL=$(which bash) -o pipefail
+export TF_IN_AUTOMATION=true
+
+include ${TFMAKE_DATA_DIR}/apply/recipes/grouping.mk
 
 all: $(util::splitlines "${modules}")
 EOF
@@ -36,7 +35,9 @@ for module in ${modules}; do
 ${module}: \$(wildcard ${module}/*.tf ${module}/*.tfvars) ${deps}
 ${tab}@mkdir -p "${TFMAKE_DATA_DIR}/apply/logs/${module}"
 ${tab}@echo "${module}" >> "${TFMAKE_DATA_DIR}/apply/outputs/visited"
-${tab}terraform -chdir="${module}" init -no-color 2>&1 | tee "${TFMAKE_DATA_DIR}/apply/logs/${module}/init.log"
-${tab}terraform -chdir="${module}" apply -auto-approve -no-color 2>&1 | tee "${TFMAKE_DATA_DIR}/apply/logs/${module}/apply.log"
+${tab}@\$(call group,${module})
+${tab}@terraform -chdir="${module}" init -no-color 2>&1 | tee "${TFMAKE_DATA_DIR}/apply/logs/${module}/init.log"
+${tab}@terraform -chdir="${module}" apply -auto-approve -no-color 2>&1 | tee "${TFMAKE_DATA_DIR}/apply/logs/${module}/apply.log"
+${tab}@\$(endgroup)
 EOF
 done
