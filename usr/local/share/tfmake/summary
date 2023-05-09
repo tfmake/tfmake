@@ -42,12 +42,13 @@ case "${1-}" in
     ;;
 esac
 
-# validations
+readonly TFMAKE_SUMMARY_TITLE="${TFMAKE_SUMMARY_TITLE:-"${TFMAKE_CONTEXT^}"}"
+
 MERMAID_FILE="${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/outputs/mermaid.md"
-SUMMARY_TITLE="${SUMMARY_TITLE:-"${TFMAKE_CONTEXT^}"}"
 SUMMARY_FILE="${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/outputs/summary.md"
 BREADCRUMBS_FILE="${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/outputs/breadcrumbs"
 
+# validations
 util::file_exist_condition \
   "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/store/visited/keys" \
   "tfmake run"
@@ -70,8 +71,8 @@ function breadcrumb() {
 truncate -s 0 "${SUMMARY_FILE}" "${BREADCRUMBS_FILE}"
 
 # title
-if [[ -n "${SUMMARY_TITLE}" ]]; then
-  echo "### ${SUMMARY_TITLE}" > "${SUMMARY_FILE}"
+if [[ -n "${TFMAKE_SUMMARY_TITLE}" ]]; then
+  echo "### ${TFMAKE_SUMMARY_TITLE}" > "${SUMMARY_FILE}"
   util::append_new_line "${SUMMARY_FILE}"
 
   breadcrumb "title"

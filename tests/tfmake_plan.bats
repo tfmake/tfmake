@@ -207,9 +207,9 @@ EOF
 }
 
 @test "tfmake summary (with title)" {
-  export SUMMARY_TITLE="Basic Project Plan"
+  export TFMAKE_SUMMARY_TITLE="Basic Project Plan"
   bash tfmake summary
-  assert_file_contains ".tfmake/plan/outputs/summary.md" "${SUMMARY_TITLE}"
+  assert_file_contains ".tfmake/plan/outputs/summary.md" "${TFMAKE_SUMMARY_TITLE}"
 }
 
 @test "tfmake gh-pr-comment (no --number)" {
