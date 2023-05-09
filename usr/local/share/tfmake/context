@@ -23,7 +23,7 @@ EOF
   exit
 }
 
-[[ $# -eq 0 ]] && util::global_config_get context
+[[ $# -eq 0 ]] && util::global_config_get "context"
 
 case "${1-}" in
   -h|--help|help)

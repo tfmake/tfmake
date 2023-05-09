@@ -45,7 +45,7 @@ function context() {
   store::basepath "${TFMAKE_DATA_DIR}/global/store"
   store::use config
 
-  TFMAKE_CONTEXT=$(kv::get context)
+  TFMAKE_CONTEXT=$(util::global_config_get "context")
   util::validate_context "${TFMAKE_CONTEXT}"
 
   export TFMAKE_CONTEXT
