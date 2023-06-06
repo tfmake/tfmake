@@ -47,8 +47,8 @@ esac
 SUMMARY_FILE="${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/outputs/summary.md"
 BREADCRUMBS_FILE="${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/outputs/breadcrumbs"
 
-# The max value is 35536, but some room is left (2^15).
-readonly MAX_COMMENT_SIZE="${MAX_COMMENT_SIZE:-"32768"}"
+# The max value is 65536, but some room is left (1024).
+readonly MAX_COMMENT_SIZE="${MAX_COMMENT_SIZE:-"64512"}"
 
 if [[ "${dry_run}" == "false" && -z "${number}" ]]; then
   printf ">>> Missing '--number' option.\n"
