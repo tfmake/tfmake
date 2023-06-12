@@ -74,8 +74,8 @@ sleep 1
 store::truncate modified
 for file in ${files}; do
   if [[ ! -f ${file} && ! -d ${file} ]]; then
-    printf ">>> %s: No such file or directory.\n" "${file}"
-    continue
+    printf ">>> %s: no such file or directory; changing to a sibling file.\n" "${file}"
+    file="$(dirname "${file}")/main.tf"
   fi
 
   printf ">>> touch: %s\n" "${file}"
