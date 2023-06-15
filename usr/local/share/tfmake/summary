@@ -17,24 +17,13 @@ Usage:
 
 Options:
   -h, --help, help  Show this help output.
-  --no-diagram      The summary won't contain the Mermaid flowchart diagram.
-  --no-outputs      The summary won't contain the Terraform outputs.
 EOF
   exit
 }
 
-with_diagram=true
-with_outputs=true
-
 case "${1-}" in
   -h|--help|help)
     usage
-    ;;
-  --no-diagram)
-    with_diagram=false
-    ;;
-  --no-outputs)
-    with_outputs=false
     ;;
   ?*)
     printf ">>> Unknown option: %s\n\n" "${1}"
@@ -44,7 +33,6 @@ esac
 
 readonly TFMAKE_SUMMARY_TITLE="${TFMAKE_SUMMARY_TITLE:-"${TFMAKE_CONTEXT^}"}"
 
-MERMAID_FILE="${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/outputs/mermaid.md"
 SUMMARY_FILE="${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/outputs/summary.md"
 BREADCRUMBS_FILE="${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/outputs/breadcrumbs"
 
@@ -52,12 +40,6 @@ BREADCRUMBS_FILE="${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/outputs/breadcrumbs"
 util::file_exist_condition \
   "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/store/visited/keys" \
   "tfmake run"
-
-if [[ "${with_diagram}" == "true" ]]; then
-  util::file_exist_condition \
-    "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/outputs/mermaid.md" \
-    "tfmake mermaid"
-fi
 
 # subcommand
 function breadcrumb() {
@@ -78,30 +60,23 @@ if [[ -n "${TFMAKE_SUMMARY_TITLE}" ]]; then
   breadcrumb "title"
 fi
 
-# diagram
-if [[ "${with_diagram}" == "true" ]]; then
-  cat >> "${SUMMARY_FILE}" << EOF
-${BACKTICKS}mermaid
-$(cat "${MERMAID_FILE}")
-${BACKTICKS}
-EOF
-
-  util::append_new_line "${SUMMARY_FILE}"
-
-  breadcrumb "diagram"
-fi
-
 # outputs
-if [[ "${with_outputs}" == "true" ]]; then
-  store::basepath "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/store"
+store::basepath "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/store"
 
-  store::use visited
-  nodes=$(kv::keys)
+store::use visited
+nodes=$(kv::keys)
 
-  for node in ${nodes}; do
-    cat >> "${SUMMARY_FILE}" << EOF
+for node in ${nodes}; do
+  icon=":white_check_mark:"
+
+  result=$(kv::get "$node")
+  if [[ "$result" == "false" ]]; then
+    icon=":x:"
+  fi
+
+  cat >> "${SUMMARY_FILE}" << EOF
 <details>
-<summary>Module <strong>"${node}"</strong></summary>
+<summary>Module <strong>"${node}"</strong> ${icon}</summary>
 
 ${BACKTICKS}
 $(cat "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/logs/${node}/init.log")
@@ -114,6 +89,5 @@ ${BACKTICKS}
 </details>
 EOF
 
-    breadcrumb "module"
-  done
-fi
+  breadcrumb "module"
+done

@@ -96,7 +96,7 @@ setup() {
 }
 
 @test "tfmake summary (before run)" {
-  run bash tfmake summary --no-diagram
+  run bash tfmake summary
   assert_output ">>> Run 'tfmake run' first."
 }
 
@@ -176,19 +176,9 @@ EOF
   assert_output B
 }
 
-@test "tfmake summary (before mermaid)" {
-  run bash tfmake summary
-  assert_output ">>> Run 'tfmake mermaid' first."
-}
-
 @test "tfmake gh-pr-comment (before summary)" {
   run bash tfmake gh-pr-comment --number 1 --dry-run
   assert_output ">>> Run 'tfmake summary' first."
-}
-
-@test "tfmake summary (without mermaid)" {
-  run bash tfmake summary --no-diagram
-  assert_file_exist ".tfmake/apply/outputs/summary.md"
 }
 
 @test "tfmake mermaid" {
