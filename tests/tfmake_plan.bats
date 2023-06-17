@@ -212,6 +212,6 @@ EOF
   export MAX_COMMENT_SIZE=${size}
 
   run bash tfmake gh-pr-comment --dry-run
-  assert_file_exist ".tfmake/plan/outputs/fragment-0.md"
   assert_file_exist ".tfmake/plan/outputs/fragment-1.md"
+  assert_file_exist ".tfmake/plan/outputs/fragment-2.md"
 }

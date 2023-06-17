@@ -43,27 +43,6 @@ case "${1-}" in
     ;;
 esac
 
-# validations
-SUMMARY_FILE="${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/outputs/summary.md"
-BREADCRUMBS_FILE="${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/outputs/breadcrumbs"
-
-# The max value is 65536, but some room is left (1024).
-readonly MAX_COMMENT_SIZE="${MAX_COMMENT_SIZE:-"64512"}"
-
-if [[ "${dry_run}" == "false" && -z "${number}" ]]; then
-  printf ">>> Missing '--number' option.\n"
-  exit 1
-fi
-
-util::file_exist_condition \
-  "${SUMMARY_FILE}" \
-  "tfmake summary"
-
-util::file_exist_condition \
-  "${BREADCRUMBS_FILE}" \
-  "tfmake summary"
-
-# subcommand
 function add_header() {
   local file="${1-}"
 
@@ -85,6 +64,28 @@ ${BACKTICKS}
 EOF
 }
 
+# validations
+SUMMARY_FILE="${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/outputs/summary.md"
+BREADCRUMBS_FILE="${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/outputs/breadcrumbs"
+FRAGMENTS_FILE="${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/outputs/fragments"
+
+# The max value is 65536, but some room is left (1024).
+readonly MAX_COMMENT_SIZE="${MAX_COMMENT_SIZE:-"64512"}"
+
+if [[ "${dry_run}" == "false" && -z "${number}" ]]; then
+  printf ">>> Missing '--number' option.\n"
+  exit 1
+fi
+
+util::file_exist_condition \
+  "${SUMMARY_FILE}" \
+  "tfmake summary"
+
+util::file_exist_condition \
+  "${BREADCRUMBS_FILE}" \
+  "tfmake summary"
+
+# subcommand
 size=$(wc -c "${SUMMARY_FILE}" | awk '{print $1}')
 
 if [[ ${size} -le ${MAX_COMMENT_SIZE} ]]; then
@@ -94,13 +95,27 @@ if [[ ${size} -le ${MAX_COMMENT_SIZE} ]]; then
     gh pr comment "${number}" -F "${SUMMARY_FILE}"
   fi
 else
-  suffix=0
+  title=$(head -n 1 "${SUMMARY_FILE}")
+
+  awk -f "${TFMAKE_SCRIPT_DIR}/../share/tfmake/fragments.awk" \
+    "${BREADCRUMBS_FILE}" \
+    "${MAX_COMMENT_SIZE}" \
+    > "${FRAGMENTS_FILE}"
+
+  count=1
+  total=$(awk "END{print NR}" "${FRAGMENTS_FILE}")
+
   while IFS= read -r line; do
     offset=$(echo "${line}" | awk '{print $1}')
     size=$(echo "${line}" | awk '{print $2}')
 
-    fragment_file="${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/outputs/fragment-${suffix}.md"
+    fragment_file="${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/outputs/fragment-${count}.md"
     truncate -s 0 "${fragment_file}"
+
+    # set title for any fragment other than first
+    if [[ ${count} -ne 1 ]]; then
+      echo "${title} [${count}/${total}]" > "${fragment_file}"
+    fi
 
     header=$(echo "${line}" | awk '{print $3}')
     if [[ "${header}" == "true" ]]; then
@@ -108,6 +123,11 @@ else
     fi
 
     tail -c "+${offset}" "${SUMMARY_FILE}" | head -c "${size}" >> "${fragment_file}"
+
+    # first fragment, update the title
+    if [[ ${count} -eq 1 ]]; then
+      sed -i "" -e "s/${title}/${title} [${count}\/${total}]/" "${fragment_file}"
+    fi
 
     footer=$(echo "${line}" | awk '{print $4}')
     if [[ "${footer}" == "true" ]]; then
@@ -120,6 +140,6 @@ else
       gh pr comment "${number}" -F "${fragment_file}"
     fi
 
-    ((suffix=suffix+1))
-  done <  <(awk -f "${TFMAKE_SCRIPT_DIR}/../share/tfmake/fragments.awk" "${BREADCRUMBS_FILE}" "${MAX_COMMENT_SIZE}")
+    ((count=count+1))
+  done <  <(cat "${FRAGMENTS_FILE}")
 fi
