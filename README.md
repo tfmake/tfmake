@@ -35,7 +35,7 @@ Available Commands:
   context           An alias for 'tfmake config' over the context value.
   init              Initialize the data directory for Terraform plan/apply execution.
   makefile          Generate a Makefile for Terraform plan/apply execution.
-  mermaid           Generate a Mermaid flowchart diagram from Terraform modules and their dependencies.
+  graph             Generate a graph diagram from Terraform modules and their dependencies.
   run               Run the Terraform plan/apply Makefile.
   summary           Create a Markdown summary.
   touch             Touch modified files.

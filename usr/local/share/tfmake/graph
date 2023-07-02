@@ -15,9 +15,9 @@ CLASS_DEF_FAILED=${CLASS_DEF_FAILED:-"fill:#f0aeb5,stroke:#af2a36,color:#af2a36;
 function usage() {
   cat << EOF
 Usage:
-  tfmake mermaid [options]
+  tfmake graph [options]
 
-  This command generate a Mermaid flowchart diagram from modules and their dependencies.
+  This command generate a graph diagram from Terraform modules and their dependencies.
 
 Options:
   -h, --help, help  Show this help output.

@@ -131,8 +131,8 @@ setup() {
   assert_output "local"
 }
 
-@test "tfmake mermaid (before run)" {
-  run bash tfmake mermaid
+@test "tfmake graph (before run)" {
+  run bash tfmake graph
   assert_output ">>> Run 'tfmake run' first."
 }
 
@@ -222,8 +222,8 @@ EOF
   assert_output ">>> Run 'tfmake summary' first."
 }
 
-@test "tfmake mermaid" {
-  bash tfmake mermaid
+@test "tfmake graph" {
+  bash tfmake graph
   assert_file_exist ".tfmake/plan/outputs/mermaid.md"
 }
 
