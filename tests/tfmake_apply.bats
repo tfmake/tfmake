@@ -14,7 +14,7 @@ setup() {
   bash tfmake context apply
 }
 
-@test "tfmake cleanup" {
+@test "tfmake cleanup (1st)" {
   bash tfmake cleanup
 }
 
@@ -54,6 +54,47 @@ setup() {
   assert_output A
 }
 
+@test "tfmake cleanup (2nd)" {
+  bash tfmake cleanup
+}
+
+@test "tfmake init (with -i)" {
+  bash tfmake init -i C
+
+  # directory structure
+  assert_dir_exist ".tfmake"
+
+  assert_dir_exist ".tfmake/apply"
+  assert_dir_exist ".tfmake/apply/logs"
+  assert_dir_exist ".tfmake/apply/outputs"
+
+  assert_dir_exist ".tfmake/apply/store"
+  assert_dir_exist ".tfmake/apply/store/modules"
+  assert_dir_exist ".tfmake/apply/store/dependencies"
+  assert_dir_exist ".tfmake/apply/store/ignore"
+
+  # kv store
+  store::basepath .tfmake/apply/store
+
+  store::use modules
+
+  run kv::get A
+  assert_output true
+
+  run kv::get B
+  assert_output true
+
+  store::use ignore
+
+  run kv::get C
+  assert_output true
+
+  store::use dependencies
+
+  run kv::get B
+  assert_output A
+}
+
 @test "tfmake run (before makefile)" {
   run bash tfmake run
   assert_output ">>> Run 'tfmake makefile' first."
@@ -64,14 +105,14 @@ setup() {
   assert_file_exist ".tfmake/apply/Makefile"
 }
 
-@test "tfmake makefile (local log grouping)" {
+@test "tfmake makefile (local log grouping on)" {
   bash tfmake makefile
 
   run util::global_config_get "cicd"
   assert_output "local"
 }
 
-@test "tfmake makefile (github log grouping)" {
+@test "tfmake makefile (github log grouping on)" {
   export GITHUB_ACTIONS=true
 
   bash tfmake makefile
@@ -123,7 +164,7 @@ setup() {
 }
 
 @test "tfmake run" {
-  bash tfmake run > /dev/null
+  bash tfmake run
 
   # kv store
   store::basepath .tfmake/apply/store
@@ -141,12 +182,12 @@ setup() {
 }
 
 @test "tfmake run (second time)" {
-  run bash tfmake run > /dev/null
+  run bash tfmake run
   assert_output --partial "make: Nothing to be done for"
 }
 
 @test "tfmake run (all)" {
-  bash tfmake run --all > /dev/null
+  bash tfmake run --all
 
   # kv store
   store::basepath .tfmake/apply/store

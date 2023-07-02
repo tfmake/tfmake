@@ -17,13 +17,19 @@ Usage:
 
 Options:
   -h, --help, help  Show this help output.
+  -i, --ignore      List of modules to ignore.
 EOF
   exit
 }
 
+ignore=""
+
 case "${1-}" in
   -h|--help|help)
     usage
+    ;;
+  -i|--ignore)
+    ignore="${2-}"
     ;;
   ?*)
     printf ">>> Unknown option: %s\n\n" "${1}"
@@ -31,21 +37,74 @@ case "${1-}" in
     ;;
 esac
 
+function is_ignored() {
+  local module="${1-}"
+  local result=false
+
+  if [[ -n "${ignore}" ]]; then
+    store::use ignore
+    if [[ -n $(kv::get "${module}") ]]; then
+      result=true
+    fi
+  fi
+
+  echo "${result}"
+}
+
+function get_deps() {
+  local module="${1-}"
+  local deps=""
+
+  if [[ -f "${module}/.tfmake" ]]; then
+    deps=$(yq -o=csv ".dependencies" "${module}/.tfmake")
+  fi
+
+  # sanitize deps, by removing the module itself and ignored modules
+  local sep=""
+  local items=${deps//,/ }
+  deps=""
+
+  for item in ${items}; do
+    if [[ "${item}" == "${module}" || $(is_ignored "${item}") == "true" ]]; then
+      continue
+    fi
+
+    deps+="${sep}${item}"
+    sep=","
+  done
+
+  echo "${deps}"
+}
+
 mkdir -p "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}"/{logs,outputs,recipes}
 
 store::basepath "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/store"
 
-store::use modules
-while IFS= read -r -d '' file; do
-  kv::set "$(dirname "${file}")" true
-done <  <(find -- * -name main.tf -type f -print0)
+# set ignore modules
+if [[ -n "${ignore}" ]]; then
+  store::use ignore
 
-store::use dependencies
+  for module in ${ignore}; do
+    kv::set "${module}" true
+  done
+fi
+
 while IFS= read -r -d '' file; do
   module=$(dirname "${file}")
 
-  deps=$(yq -o=csv ".dependencies" "${file}")
-  if [[ -n ${deps} ]]; then
+  # continue if the module is ignored
+  if [[ $(is_ignored "${module}") == "true" ]]; then
+    continue
+  fi
+
+  # otherwise, include it
+  store::use modules
+  kv::set "${module}" true
+
+  # and its dependencies
+  deps=$(get_deps "${module}")
+  if [[ -n "${deps}" ]]; then
+    store::use dependencies
     kv::set "${module}" "${deps}"
   fi
-done <  <(find -- * -name .tfmake -type f -print0)
+done <  <(find -- * -name main.tf -type f -print0)

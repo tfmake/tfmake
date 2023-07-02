@@ -8,6 +8,11 @@ tfmake is a tool for automating Terraform with the power of make.
 - yq
 - make
 
+## Limitations
+
+- To ensure an ordered execution, all dependencies between modules MUST be explicitly declared.
+- Modules paths SHOULD NOT containt spaces; e.g. use `sample_module` instead `sample module`.
+
 ## Installation
 
 ### Git
