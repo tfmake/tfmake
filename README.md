@@ -32,7 +32,7 @@ Usage:
 Available Commands:
   cleanup           Cleanup the data directory.
   config            Modify tfmake configuration.
-  context           An alias for 'tfmake config' over the context value.
+  context           Set the execution context, plan or apply.
   init              Initialize the data directory for Terraform plan/apply execution.
   makefile          Generate a Makefile for Terraform plan/apply execution.
   graph             Generate a graph diagram from Terraform modules and their dependencies.

@@ -13,7 +13,7 @@ function usage() {
 Usage:
   tfmake context [options]
 
-  This command is an alias for 'tfmake config' over the context value.
+  This command set the execution context, plan or apply.
 
 Options:
   -h, --help, help  Show this help output.
