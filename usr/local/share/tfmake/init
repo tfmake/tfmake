@@ -89,6 +89,14 @@ if [[ -n "${ignore}" ]]; then
   done
 fi
 
+# Let two modules be A and B, with A being the newest and a dependency of B.
+# Then, by following make semantics, B will be executed;
+# even if all files inside B remains unchanged.
+
+# Capturing the current time, to "touch" all modules with it,
+# prevents that behaviour.
+mtime=$(date +%Y%m%d%H%M.%S)
+
 while IFS= read -r -d '' file; do
   module=$(dirname "${file}")
 
@@ -100,6 +108,8 @@ while IFS= read -r -d '' file; do
   # otherwise, include it
   store::use modules
   kv::set "${module}" true
+
+  touch -c -m -t "${mtime}" "${module}"
 
   # and its dependencies
   deps=$(get_deps "${module}")
