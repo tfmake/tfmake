@@ -31,6 +31,14 @@ case "${1-}" in
     ;;
 esac
 
+function breadcrumb() {
+  local section="${1-}"
+
+  bytes=$(wc -c "${SUMMARY_FILE}" | awk '{print $1}')
+
+  printf "%s\t%d\n" "${section}" "${bytes}" >> "${BREADCRUMBS_FILE}"
+}
+
 readonly TFMAKE_SUMMARY_TITLE="${TFMAKE_SUMMARY_TITLE:-"${TFMAKE_CONTEXT^}"}"
 
 SUMMARY_FILE="${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/outputs/summary.md"
@@ -42,14 +50,6 @@ util::file_exist_condition \
   "tfmake run"
 
 # subcommand
-function breadcrumb() {
-  local section="${1-}"
-
-  bytes=$(wc -c "${SUMMARY_FILE}" | awk '{print $1}')
-
-  printf "%s\t%d\n" "${section}" "${bytes}" >> "${BREADCRUMBS_FILE}"
-}
-
 truncate -s 0 "${SUMMARY_FILE}" "${BREADCRUMBS_FILE}"
 
 # title
@@ -66,15 +66,16 @@ store::basepath "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/store"
 store::use visited
 nodes=$(kv::keys)
 
-for node in ${nodes}; do
-  icon=":white_check_mark:"
+if [[ -n "${nodes}" ]]; then
+  for node in ${nodes}; do
+    icon=":white_check_mark:"
 
-  result=$(kv::get "$node")
-  if [[ "$result" == "false" ]]; then
-    icon=":x:"
-  fi
+    result=$(kv::get "$node")
+    if [[ "$result" == "false" ]]; then
+      icon=":x:"
+    fi
 
-  cat >> "${SUMMARY_FILE}" << EOF
+    cat >> "${SUMMARY_FILE}" << EOF
 <details>
 <summary> ${icon} Module <strong>"${node}"</strong></summary>
 
@@ -89,5 +90,10 @@ ${BACKTICKS}
 </details>
 EOF
 
-  breadcrumb "module"
-done
+    breadcrumb "module"
+  done
+else
+  cat >> "${SUMMARY_FILE}" << EOF
+_Unchanged files, Terraform **${TFMAKE_CONTEXT}** didn't run!_
+EOF
+fi
