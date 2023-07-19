@@ -8,10 +8,27 @@ TFMAKE_DATA_DIR="${TFMAKE_DATA_DIR:-".tfmake"}"
   BACKTICKS='```'
 }
 
+function util::log_info() {
+  local msg="${1-}"
+  echo >&2 -e "[$(date -u)] [INFO] ${msg}"
+}
+
 function util::log_err() {
   local msg="${1-}"
+  echo >&2 -e "[$(date -u)] [ERROR] ${msg}"
 
-  echo "${msg}" >&2
+  exit 1
+}
+
+function util::msg() {
+  local msg="${1-}"
+  echo >&2 -e "${msg}"
+}
+
+function util::die() {
+  local msg="${1-}"
+  echo >&2 -e "${msg}"
+
   exit 1
 }
 
@@ -32,7 +49,7 @@ function util::file_exist_condition () {
   local command="${2-}"
 
   if [[ ! -f ${file} ]]; then
-    util::log_err ">>> Run '${command}' first."
+    util::die "Run '${command}' first."
   fi
 }
 
@@ -40,11 +57,11 @@ function util::validate_context() {
   local context="${1-}"
 
   if [[ -z "${context}" ]]; then
-    util::log_err ">>> Run 'tfmake context <plan|apply>' first."
+    util::die "Run 'tfmake context <plan|apply>' first."
   fi
 
   if [[ ! "${context}" =~ ^(plan|apply)$ ]]; then
-    util::log_err ">>> Invalid context: ${context}"
+    util::die "Invalid context: ${context}"
   fi
 }
 
@@ -54,11 +71,11 @@ function util::global_config_set() {
 
   # validation
   if [[ -z "${key}" ]]; then
-    util::log_err ">>> Missing config key."
+    util::die "Missing config key."
   fi
 
   if [[ -z "${value}" ]]; then
-    util::log_err ">>> Missing config value for '${key}' key."
+    util::die "Missing config value for '${key}' key."
   fi
 
   store::basepath "${TFMAKE_DATA_DIR}/global/store"
@@ -72,7 +89,7 @@ function util::global_config_get() {
 
   # validation
   if [[ -z "${key}" ]]; then
-    util::log_err ">>> Missing config key."
+    util::die "Missing config key."
   fi
 
   store::basepath "${TFMAKE_DATA_DIR}/global/store"

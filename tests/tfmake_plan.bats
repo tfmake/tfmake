@@ -20,7 +20,7 @@ setup() {
 
 @test "tfmake makefile (before init)" {
   run bash tfmake makefile
-  assert_output ">>> Run 'tfmake init' first."
+  assert_output "Run 'tfmake init' first."
 }
 
 @test "tfmake init" {
@@ -97,7 +97,7 @@ setup() {
 
 @test "tfmake run (before makefile)" {
   run bash tfmake run
-  assert_output ">>> Run 'tfmake makefile' first."
+  assert_output "Run 'tfmake makefile' first."
 }
 
 @test "tfmake makefile" {
@@ -133,12 +133,12 @@ setup() {
 
 @test "tfmake graph (before run)" {
   run bash tfmake graph
-  assert_output ">>> Run 'tfmake run' first."
+  assert_output "Run 'tfmake run' first."
 }
 
 @test "tfmake summary (before run)" {
   run bash tfmake summary
-  assert_output ">>> Run 'tfmake run' first."
+  assert_output "Run 'tfmake run' first."
 }
 
 @test "tfmake touch" {
@@ -207,19 +207,19 @@ setup() {
 @test "tfmake run (dry run)" {
   bash tfmake touch -f A/main.tf
   run bash tfmake run --dry-run
-  assert_output - << EOF
+  assert_output --partial - << EOF
 A
 B
 EOF
 
   bash tfmake touch -f B/main.tf
   run bash tfmake run --dry-run
-  assert_output B
+  assert_output --partial B
 }
 
 @test "tfmake gh-pr-comment (before summary)" {
   run bash tfmake gh-pr-comment --number 1 --dry-run
-  assert_output ">>> Run 'tfmake summary' first."
+  assert_output "Run 'tfmake summary' first."
 }
 
 @test "tfmake graph" {
@@ -245,7 +245,7 @@ EOF
 
 @test "tfmake gh-pr-comment (no --number)" {
   run bash tfmake gh-pr-comment
-  assert_output ">>> Missing '--number' option."
+  assert_output "Missing '--number' option."
 }
 
 @test "tfmake gh-pr-comment (with --dry-run)" {

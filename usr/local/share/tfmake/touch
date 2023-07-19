@@ -38,7 +38,7 @@ while :; do
       shift
       ;;
     ?*)
-      printf ">>> Unknown option: %s\n\n" "${1}"
+      printf "Unknown option: %s\n\n" "${1}"
       usage
       ;;
     *)
@@ -54,10 +54,12 @@ util::file_exist_condition \
   "tfmake init"
 
 if [[ -z ${files} ]]; then
-  util::log_err ">>> No files, anything to do."
+  util::log_err "[tfmake:touch] no files, anything to do."
 fi
 
 # subcommand
+util::log_info "[tfmake:touch] touching modified files."
+
 store::basepath "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/store"
 store::use modules
 
@@ -74,11 +76,11 @@ sleep 1
 store::truncate modified
 for file in ${files}; do
   if [[ ! -f ${file} && ! -d ${file} ]]; then
-    printf ">>> %s: no such file or directory; changing to a sibling file.\n" "${file}"
+    util::log_info "[tfmake:touch] ${file}: no such file or directory; changing to a sibling file"
     file="$(dirname "${file}")/main.tf"
   fi
 
-  printf ">>> touch: %s\n" "${file}"
+  util::log_info "[tfmake:touch] touch ${file}"
   touch -c -m "${file}"
 
   kv::set "${file}" true

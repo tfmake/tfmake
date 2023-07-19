@@ -26,7 +26,7 @@ case "${1-}" in
     usage
     ;;
   ?*)
-    printf ">>> Unknown option: %s\n\n" "${1}"
+    printf "Unknown option: %s\n\n" "${1}"
     usage
     ;;
 esac
@@ -50,6 +50,8 @@ util::file_exist_condition \
   "tfmake run"
 
 # subcommand
+util::log_info "[tfmake:summary] generating summary from 'terraform ${TFMAKE_CONTEXT}' execution logs."
+
 truncate -s 0 "${SUMMARY_FILE}" "${BREADCRUMBS_FILE}"
 
 # title

@@ -32,7 +32,7 @@ case "${1-}" in
     ignore="${2-}"
     ;;
   ?*)
-    printf ">>> Unknown option: %s\n\n" "${1}"
+    printf "Unknown option: %s\n\n" "${1}"
     usage
     ;;
 esac
@@ -82,6 +82,8 @@ store::basepath "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/store"
 
 # set ignore modules
 if [[ -n "${ignore}" ]]; then
+  util::log_info " setting ignored modules."
+
   store::use ignore
 
   for module in ${ignore}; do
@@ -96,6 +98,8 @@ fi
 # Capturing the current time, to "touch" all modules with it,
 # prevents that behaviour.
 mtime=$(date +%Y%m%d%H%M.%S)
+
+util::log_info "[tfmake:init] discovering Terraform modules and their dependencies."
 
 while IFS= read -r -d '' file; do
   module=$(dirname "${file}")

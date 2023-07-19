@@ -45,7 +45,7 @@ case "${1-}" in
     shift
     ;;
   ?*)
-    printf ">>> Unknown option: %s\n\n" "${1}"
+    printf "Unknown option: %s\n\n" "${1}"
     usage
     ;;
 esac

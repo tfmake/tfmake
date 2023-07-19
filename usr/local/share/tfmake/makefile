@@ -26,7 +26,7 @@ case "${1-}" in
     usage
     ;;
   ?*)
-    printf ">>> Unknown option: %s\n\n" "${1}"
+    printf "Unknown option: %s\n\n" "${1}"
     usage
     ;;
 esac
@@ -54,5 +54,8 @@ cp \
   "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/recipes/grouping.mk"
 
 # generate Makefile
+
+util::log_info "[tfmake:makefile] generating Makefile for 'terraform ${TFMAKE_CONTEXT}' execution."
+
 SCRIPT_PATH="${TFMAKE_SCRIPT_DIR}/../share/tfmake/makefile-${TFMAKE_CONTEXT}"
 exec "bash" "${SCRIPT_PATH}" "$@"

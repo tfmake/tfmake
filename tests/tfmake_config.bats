@@ -22,7 +22,7 @@ setup() {
 
 @test "tfmake config --get (missing)" {
   run bash tfmake config --get
-  assert_output ">>> Missing config key."
+  assert_output "Missing config key."
 }
 
 @test "tfmake context" {

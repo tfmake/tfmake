@@ -30,10 +30,11 @@ case "${1-}" in
     usage
     ;;
   plan|apply)
+    util::log_info "[tfmake:context] setting the execution context as '${1}'."
     util::global_config_set "context" "${1}"
     ;;
   ?*)
-    printf ">>> Unknown option: %s\n\n" "${1}"
+    printf "Unknown option: %s\n\n" "${1}"
     usage
     ;;
 esac

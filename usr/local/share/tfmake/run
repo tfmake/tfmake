@@ -36,7 +36,7 @@ case "${1-}" in
     mode="dry-run"
     ;;
   ?*)
-    printf ">>> Unknown option: %s\n\n" "${1}"
+    printf "Unknown option: %s\n\n" "${1}"
     usage
     ;;
 esac
@@ -50,6 +50,8 @@ util::file_exist_condition \
 truncate -s 0 "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/outputs/visited"
 
 store::basepath "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/store"
+
+util::log_info "[tfmake:run] executing 'terraform ${TFMAKE_CONTEXT}' for modules and their dependencies."
 
 # "default" mode
 if [[ "${mode}" == "default" ]]; then

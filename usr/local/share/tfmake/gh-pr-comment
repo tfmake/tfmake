@@ -38,7 +38,7 @@ case "${1-}" in
     dry_run=true
     ;;
   ?*)
-    printf ">>> Unknown option: %s\n\n" "${1}"
+    printf "Unknown option: %s\n\n" "${1}"
     usage
     ;;
 esac
@@ -73,7 +73,7 @@ FRAGMENTS_FILE="${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/outputs/fragments"
 readonly MAX_COMMENT_SIZE="${MAX_COMMENT_SIZE:-"64512"}"
 
 if [[ "${dry_run}" == "false" && -z "${number}" ]]; then
-  printf ">>> Missing '--number' option.\n"
+  printf "Missing '--number' option.\n"
   exit 1
 fi
 
@@ -86,6 +86,8 @@ util::file_exist_condition \
   "tfmake summary"
 
 # subcommand
+util::log_info "[tfmake:gh-pr-comment] adding comments to PR from 'terraform ${TFMAKE_CONTEXT}' execution logs."
+
 size=$(wc -c "${SUMMARY_FILE}" | awk '{print $1}')
 
 if [[ ${size} -le ${MAX_COMMENT_SIZE} ]]; then

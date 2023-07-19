@@ -1,5 +1,5 @@
 define group
-printf ">>> Module %s ${TFMAKE_CONTEXT}\n" \${1}
+printf "Module %s ${TFMAKE_CONTEXT}\n" \${1}
 endef
 
 define endgroup
