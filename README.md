@@ -159,7 +159,7 @@ The **touch** command is a wrapper over the corresponding Linux utility, and is 
 
 For instance, using the modules A, B and C; a change in a `.tf` file inside B will cause the execution of it and C in that order.
 
-The command could SHOULD be executed with the option `-f|--files` and a list of space separated files.
+The command could be executed with the option `-f|--files` and a list of space separated files.
 
 ```
 tfmake touch -f "A/main.tf B/main.tf"
