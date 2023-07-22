@@ -129,7 +129,7 @@ This command acts like a code generator, using the information gathered by **ini
 tfmake makefile
 ```
 
-What follows is an adapted example for a three-module project plan execution.
+What follows is an adapted example for a three-module project plan `Makefile`.
 
 ```Makefile
 all: A B C
