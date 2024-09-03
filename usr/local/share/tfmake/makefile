@@ -33,7 +33,7 @@ esac
 
 # validations
 util::file_exist_condition \
-  "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/store/dependencies/keys" \
+  "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/store/modules/keys" \
   "tfmake init"
 
 # subcommand
