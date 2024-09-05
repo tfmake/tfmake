@@ -18,7 +18,7 @@
 ### Git
 
 ```bash
-git clone git@github.com:tfmake/tfmake.git
+git clone https://github.com/tfmake/tfmake.git
 sudo cp -r tfmake/usr/local/* /usr/local/
 sudo chmod +x /usr/local/bin/tfmake
 ```
