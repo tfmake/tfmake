@@ -2,8 +2,6 @@
 
 set -u
 
-tab=$(printf '\t')
-
 # shellcheck source=/dev/null
 {
   source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/util.sh"
@@ -33,11 +31,11 @@ for module in ${modules}; do
 
   cat >> "${TFMAKE_DATA_DIR}/apply/Makefile" << EOF
 ${module}: \$(wildcard ${module}/*.tf ${module}/*.tfvars) ${deps}
-${tab}@mkdir -p "${TFMAKE_DATA_DIR}/apply/logs/${module}"
-${tab}@echo "${module}" >> "${TFMAKE_DATA_DIR}/apply/outputs/visited"
-${tab}@\$(call group,${module})
-${tab}@terraform -chdir="${module}" init -no-color 2>&1 | tee "${TFMAKE_DATA_DIR}/apply/logs/${module}/init.log"
-${tab}@terraform -chdir="${module}" apply -auto-approve -no-color 2>&1 | tee "${TFMAKE_DATA_DIR}/apply/logs/${module}/apply.log"
-${tab}@\$(endgroup)
+${TAB}@mkdir -p "${TFMAKE_DATA_DIR}/apply/logs/${module}"
+${TAB}@echo "${module}" >> "${TFMAKE_DATA_DIR}/apply/outputs/visited"
+${TAB}@\$(call group,${module})
+${TAB}@terraform -chdir="${module}" init -no-color 2>&1 | tee "${TFMAKE_DATA_DIR}/apply/logs/${module}/init.log"
+${TAB}@terraform -chdir="${module}" apply -auto-approve -no-color 2>&1 | tee "${TFMAKE_DATA_DIR}/apply/logs/${module}/apply.log"
+${TAB}@\$(endgroup)
 EOF
 done

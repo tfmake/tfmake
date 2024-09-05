@@ -82,7 +82,7 @@ store::basepath "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/store"
 
 # set ignore modules
 if [[ -n "${ignore}" ]]; then
-  util::log_info " setting ignored modules."
+  util::log_info "[tfmake:init] setting ignored modules."
 
   store::use ignore
 
