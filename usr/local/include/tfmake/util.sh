@@ -57,10 +57,10 @@ function util::validate_context() {
   local context="${1-}"
 
   if [[ -z "${context}" ]]; then
-    util::die "Run 'tfmake context <plan|apply>' first."
+    util::die "Run 'tfmake context <plan|apply|destroy>' first."
   fi
 
-  if [[ ! "${context}" =~ ^(plan|apply)$ ]]; then
+  if [[ ! "${context}" =~ ^(plan|apply|destroy)$ ]]; then
     util::die "Invalid context: ${context}"
   fi
 }

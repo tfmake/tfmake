@@ -32,11 +32,11 @@ Usage:
 Available Commands:
   cleanup           Cleanup the data directory.
   config            Modify tfmake configuration.
-  context           Set the execution context, plan or apply.
-  init              Initialize the data directory for Terraform plan/apply execution.
-  makefile          Generate a Makefile for Terraform plan/apply execution.
+  context           Set the execution context: plan, apply, or destroy.
+  init              Initialize the data directory for Terraform plan/apply/destroy execution.
+  makefile          Generate a Makefile for Terraform plan/apply/destroy execution.
   graph             Generate a graph diagram from Terraform modules and their dependencies.
-  run               Run the Terraform plan/apply Makefile.
+  run               Run the Terraform plan/apply/destroy Makefile.
   summary           Create a Markdown summary.
   touch             Touch modified files.
   version           Show the current version.
@@ -101,7 +101,7 @@ run:::primary
 
 #### tfmake context
 
-Allows to define the Terraform command to execute: plan or apply.
+Allows to define the Terraform command to execute: `plan`, `apply`, or `destroy`.
 
 ```
 tfmake context plan
@@ -134,7 +134,7 @@ What follows is an adapted example for a three-module project plan `Makefile`.
 ```Makefile
 all: A B C
 
-A: $(wildcard A/*.tf A/*.tfvars) 
+A: $(wildcard A/*.tf A/*.tfvars)
 	terraform -chdir="A" init
 	terraform -chdir="A" plan
 
@@ -149,7 +149,7 @@ C: $(wildcard C/*.tf C/*.tfvars) A B
 
 When the `Makefile` is there, it's possible to use it for running the [make](https://man7.org/linux/man-pages/man1/make.1.html) utility.
 
-One of the goals of **tfmake** is to avoid unnecessary executions. If a module (_target_) files or their dependencies don't change, there is no need to run a `plan` or `apply` on it. This behavior, derived from the `make` way of working, reduces the execution time and favors cost optimization.
+One of the goals of **tfmake** is to avoid unnecessary executions. If a module (_target_) files or their dependencies don't change, there is no need to run a `plan`, `apply`, or `destroy` on it. This behavior, derived from the `make` way of working, reduces the execution time and favors cost optimization.
 
 > The make program uses the makefile description and the last-modification times of the files to decide which of the files need to be updated.
 
@@ -165,7 +165,7 @@ The command could be executed with the option `-f|--files` and a list of space s
 tfmake touch -f "A/main.tf B/main.tf"
 ```
 
-is equivalent to 
+is equivalent to
 
 ```
 tfmake touch -f "A/main.tf" -f "B/main.tf"
@@ -179,7 +179,7 @@ As mentioned before, a `Makefile` is the entrypoint for `make` execution. The **
 
 By default (`tfmake run`), the command calls `make` and runs it with the semantics described above, avoiding unnecessary executions. However, two other modes exist with the options `--all` and `--dry-run`.
 
-The first one executes Terraform `plan` or `apply` for all modules, whereas the second is similar to the default mode, producing a list of modules but without running their recipes.
+The first one executes Terraform `plan`, `apply`, or `destroy` for all modules, whereas the second is similar to the default mode, producing a list of modules but without running their recipes.
 
 ### Outputs and feedback
 

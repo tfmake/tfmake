@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+
+set -u
+
+# shellcheck source=/dev/null
+{
+  source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/util.sh"
+  source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/store.sh"
+}
+
+store::basepath "${TFMAKE_DATA_DIR}/destroy/store"
+
+# This process involves two passes: the first pass determines the reverse topological order,
+# while the second pass generates the final Makefile.
+
+# first pass
+store::use modules
+modules=$(kv::keys)
+
+cat > "${TFMAKE_DATA_DIR}/destroy/Makefile" << EOF
+SHELL=$(which bash) -o pipefail
+
+all: $(util::splitlines "${modules}")
+EOF
+
+store::use dependencies
+for module in ${modules}; do
+  deps=$(kv::get "${module}")
+  [[ -n ${deps} ]] && deps=${deps//,/ }
+
+  util::append_new_line "${TFMAKE_DATA_DIR}/destroy/Makefile"
+
+  cat >> "${TFMAKE_DATA_DIR}/destroy/Makefile" << EOF
+${module}: \$(wildcard ${module}/*.tf ${module}/*.tfvars) ${deps}
+${TAB}@echo "${module}"
+EOF
+done
+
+# second pass
+reverse=$(make -B -i -r -R -f "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/Makefile" | tail -r)
+
+cat > "${TFMAKE_DATA_DIR}/destroy/Makefile" << EOF
+SHELL=$(which bash) -o pipefail
+export TF_IN_AUTOMATION=true
+
+include ${TFMAKE_DATA_DIR}/destroy/recipes/grouping.mk
+
+all: $(util::splitlines "${reverse}")
+EOF
+
+deps=""
+for module in ${reverse}; do
+  util::append_new_line "${TFMAKE_DATA_DIR}/destroy/Makefile"
+
+  cat >> "${TFMAKE_DATA_DIR}/destroy/Makefile" << EOF
+${module}: \$(wildcard ${module}/*.tf ${module}/*.tfvars) ${deps}
+${TAB}@mkdir -p "${TFMAKE_DATA_DIR}/destroy/logs/${module}"
+${TAB}@echo "${module}" >> "${TFMAKE_DATA_DIR}/destroy/outputs/visited"
+${TAB}@\$(call group,${module})
+${TAB}@terraform -chdir="${module}" init -no-color 2>&1 | tee "${TFMAKE_DATA_DIR}/destroy/logs/${module}/init.log"
+${TAB}@terraform -chdir="${module}" apply -destroy -auto-approve -no-color 2>&1 | tee "${TFMAKE_DATA_DIR}/destroy/logs/${module}/destroy.log"
+${TAB}@\$(endgroup)
+EOF
+
+  deps=${module}
+done

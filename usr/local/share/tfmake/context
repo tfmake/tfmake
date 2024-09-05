@@ -13,12 +13,13 @@ function usage() {
 Usage:
   tfmake context [options]
 
-  This command set the execution context, plan or apply.
+  This command set the execution context: plan, apply, or destroy.
 
 Options:
   -h, --help, help  Show this help output.
   plan              Set the context value as 'plan'.
   apply             Set the context value as 'apply'.
+  destroy           Set the context value as 'destroy'.
 EOF
   exit
 }
@@ -29,7 +30,7 @@ case "${1-}" in
   -h|--help|help)
     usage
     ;;
-  plan|apply)
+  plan|apply|destroy)
     util::log_info "[tfmake:context] setting the execution context as '${1}'."
     util::global_config_set "context" "${1}"
     ;;

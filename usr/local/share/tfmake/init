@@ -13,7 +13,7 @@ function usage() {
 Usage:
   tfmake init [options]
 
-  This command initialize the data directory for Terraform plan/apply execution.
+  This command initialize the data directory for Terraform plan/apply/destroy execution.
 
 Options:
   -h, --help, help  Show this help output.
