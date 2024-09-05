@@ -23,6 +23,47 @@ setup() {
   assert_output "Run 'tfmake init' first."
 }
 
+@test "tfmake init (with -i)" {
+  bash tfmake init -i A
+
+  # directory structure
+  assert_dir_exist ".tfmake"
+
+  assert_dir_exist ".tfmake/apply"
+  assert_dir_exist ".tfmake/apply/logs"
+  assert_dir_exist ".tfmake/apply/outputs"
+
+  assert_dir_exist ".tfmake/apply/store"
+  assert_dir_exist ".tfmake/apply/store/modules"
+  assert_dir_exist ".tfmake/apply/store/dependencies"
+  assert_dir_exist ".tfmake/apply/store/ignore"
+
+  # kv store
+  store::basepath .tfmake/apply/store
+
+  store::use modules
+
+  run kv::get B
+  assert_output true
+
+  run kv::get C
+  assert_output true
+
+  store::use ignore
+
+  run kv::get A
+  assert_output true
+
+  store::use dependencies
+
+  run kv::get B
+  assert_output C
+}
+
+@test "tfmake cleanup (2nd)" {
+  bash tfmake cleanup
+}
+
 @test "tfmake init" {
   bash tfmake init
 
@@ -48,51 +89,13 @@ setup() {
   run kv::get B
   assert_output true
 
-  store::use dependencies
-
-  run kv::get B
-  assert_output A
-}
-
-@test "tfmake cleanup (2nd)" {
-  bash tfmake cleanup
-}
-
-@test "tfmake init (with -i)" {
-  bash tfmake init -i C
-
-  # directory structure
-  assert_dir_exist ".tfmake"
-
-  assert_dir_exist ".tfmake/apply"
-  assert_dir_exist ".tfmake/apply/logs"
-  assert_dir_exist ".tfmake/apply/outputs"
-
-  assert_dir_exist ".tfmake/apply/store"
-  assert_dir_exist ".tfmake/apply/store/modules"
-  assert_dir_exist ".tfmake/apply/store/dependencies"
-  assert_dir_exist ".tfmake/apply/store/ignore"
-
-  # kv store
-  store::basepath .tfmake/apply/store
-
-  store::use modules
-
-  run kv::get A
-  assert_output true
-
-  run kv::get B
-  assert_output true
-
-  store::use ignore
-
   run kv::get C
   assert_output true
 
   store::use dependencies
 
   run kv::get B
-  assert_output A
+  assert_output C
 }
 
 @test "tfmake run (before makefile)" {
@@ -153,26 +156,26 @@ setup() {
 }
 
 @test "tfmake touch (repeated -f)" {
-  bash tfmake touch -f A/main.tf -f A/terraform.tfvars
+  bash tfmake touch -f C/main.tf -f C/terraform.tfvars
 
   # kv store
   store::basepath .tfmake/apply/store
   store::use modified
 
   run util::splitlines "$(kv::keys)"
-  assert_output "A/main.tf A/terraform.tfvars"
+  assert_output "C/main.tf C/terraform.tfvars"
 }
 
 @test "tfmake run" {
   bash tfmake run
 
-  # kv store
-  store::basepath .tfmake/apply/store
+  assert_file_exist ".tfmake/apply/outputs/visited"
+  run cat ".tfmake/apply/outputs/visited"
 
-  store::use visited
-
-  run util::splitlines "$(kv::keys)"
-  assert_output "A B"
+  assert_output << EOF
+C
+B
+EOF
 
   # terraform logs
   for key in $(util::splitlines "$(kv::keys)"); do
@@ -189,13 +192,14 @@ setup() {
 @test "tfmake run (all)" {
   bash tfmake run --all
 
-  # kv store
-  store::basepath .tfmake/apply/store
+  assert_file_exist ".tfmake/apply/outputs/visited"
+  run cat ".tfmake/apply/outputs/visited"
 
-  store::use visited
-
-  run util::splitlines "$(kv::keys)"
-  assert_output "A B"
+  assert_output << EOF
+A
+C
+B
+EOF
 
   # terraform logs
   for key in $(util::splitlines "$(kv::keys)"); do
@@ -209,12 +213,14 @@ setup() {
   run bash tfmake run --dry-run
   assert_output --partial - << EOF
 A
-B
 EOF
 
-  bash tfmake touch -f B/main.tf
+  bash tfmake touch -f C/main.tf
   run bash tfmake run --dry-run
-  assert_output --partial B
+  assert_output << EOF
+C
+B
+EOF
 }
 
 @test "tfmake gh-pr-comment (before summary)" {
