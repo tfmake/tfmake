@@ -13,11 +13,11 @@ function usage() {
 Usage:
   tfmake run [options]
 
-  This command run the Terraform plan/apply/destroy Makefile.
+  This command run the generated Makefile for Terraform execution.
 
 Options:
   -h, --help, help  Show this help output.
-  --all             Execute the plan/apply/destroy Makefile for all modules.
+  --all             Execute Terraform for all modules.
   --dry-run         Print the modules that would be executed, but don't execute them.
 EOF
   exit

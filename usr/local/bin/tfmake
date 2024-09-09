@@ -16,16 +16,18 @@ export TFMAKE_SCRIPT_DIR
 function usage() {
   cat << EOF
 Usage:
-  tfmake command [options] [args]
+  tfmake command [options]
 
-Available Commands:
+Core Commands:
+  context           Set the execution context: plan, apply, or destroy.
+  init              Initialize the data directory for Terraform execution.
+  makefile          Generate a Makefile for Terraform execution.
+  run               Run the generated Makefile for Terraform execution.
+
+Other Commands:
   cleanup           Cleanup the data directory.
   config            Modify tfmake configuration.
-  context           Set the execution context: plan, apply, or destroy.
-  init              Initialize the data directory for Terraform plan/apply/destroy execution.
-  makefile          Generate a Makefile for Terraform plan/apply/destroy execution.
-  graph             Generate a graph diagram from Terraform modules and their dependencies.
-  run               Run the Terraform plan/apply/destroy Makefile.
+  graph             Generate a graph from Terraform modules and their dependencies.
   summary           Create a Markdown summary.
   touch             Touch modified files.
   version           Show the current version.
@@ -34,7 +36,7 @@ GitHub Commands:
   gh-pr-comment     Add a comment to a GitHub pull request.
   gh-step-summary   Add content to GitHub Step Summary.
 
-Other options:
+Global options:
   -h, --help, help  Print this help and exit.
   -v, --version     An alias for the "version" subcommand.
 EOF

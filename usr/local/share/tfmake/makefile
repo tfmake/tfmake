@@ -13,7 +13,7 @@ function usage() {
 Usage:
   tfmake makefile [options]
 
-  This command generate a Makefile for Terraform plan/apply/destroy execution.
+  This command generate a Makefile for Terraform execution.
 
 Options:
   -h, --help, help  Show this help output.

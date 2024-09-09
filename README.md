@@ -27,16 +27,18 @@ sudo chmod +x /usr/local/bin/tfmake
 
 ```
 Usage:
-  tfmake command [options] [args]
+  tfmake command [options]
 
-Available Commands:
+Core Commands:
+  context           Set the execution context: plan, apply, or destroy.
+  init              Initialize the data directory for Terraform execution.
+  makefile          Generate a Makefile for Terraform execution.
+  run               Run the generated Makefile for Terraform execution.
+
+Other Commands:
   cleanup           Cleanup the data directory.
   config            Modify tfmake configuration.
-  context           Set the execution context: plan, apply, or destroy.
-  init              Initialize the data directory for Terraform plan/apply/destroy execution.
-  makefile          Generate a Makefile for Terraform plan/apply/destroy execution.
-  graph             Generate a graph diagram from Terraform modules and their dependencies.
-  run               Run the Terraform plan/apply/destroy Makefile.
+  graph             Generate a graph from Terraform modules and their dependencies.
   summary           Create a Markdown summary.
   touch             Touch modified files.
   version           Show the current version.
@@ -45,7 +47,7 @@ GitHub Commands:
   gh-pr-comment     Add a comment to a GitHub pull request.
   gh-step-summary   Add content to GitHub Step Summary.
 
-Other options:
+Global options:
   -h, --help, help  Print this help and exit.
   -v, --version     An alias for the "version" subcommand.
 ```
@@ -76,7 +78,7 @@ dependencies:
 
 Similar to Terraform, **tfmake** is composed of multiple commands, each one playing an important role in a predefined sequence.
 
-The core sequence is made up of five commands, as illustrated in the next diagram.
+The core sequence is made up of four commands, as illustrated in the next diagram.
 
 ```mermaid
 flowchart LR
@@ -87,15 +89,13 @@ classDef secondary fill:#fee69b,stroke:#fee69b,color:#987405;
 context("tfmake context")
 init("tfmake init")
 makefile("tfmake makefile")
-touch("tfmake touch")
 run("tfmake run")
 
-context --> init --> makefile --> touch --> run
+context --> init --> makefile --> run
 
 context:::primary
 init:::primary
 makefile:::primary
-touch:::primary
 run:::primary
 ```
 
@@ -153,6 +153,16 @@ One of the goals of **tfmake** is to avoid unnecessary executions. If a module (
 
 > The make program uses the makefile description and the last-modification times of the files to decide which of the files need to be updated.
 
+#### tfmake run
+
+As mentioned before, a `Makefile` is the entrypoint for `make` execution. The **run** command brings some advantages over it, including multiple modes of execution and a proper handling of failures for CI/CD pipelines.
+
+By default (`tfmake run`), the command calls `make` and runs it with the semantics described above, avoiding unnecessary executions. However, two other modes exist with the options `--all` and `--dry-run`.
+
+The first one executes Terraform `plan`, `apply`, or `destroy` for all modules, whereas the second is similar to the default mode, producing a list of modules but without running their recipes.
+
+### A special command
+
 #### tfmake touch
 
 The **touch** command is a wrapper over the corresponding Linux utility, and is used to change the modification time of modules files. This is mandatory in a GitHub Actions workflow after a [checkout](https://github.com/actions/checkout) or could be used in a local environment to force the `make` semantics.
@@ -172,14 +182,6 @@ tfmake touch -f "A/main.tf" -f "B/main.tf"
 ```
 
 > In a GitHub Actions workflow use `tj-actions/changed-files` to get the list of changed files.
-
-#### tfmake run
-
-As mentioned before, a `Makefile` is the entrypoint for `make` execution. The **run** command brings some advantages over it, including multiple modes of execution and a proper handling of failures for CI/CD pipelines.
-
-By default (`tfmake run`), the command calls `make` and runs it with the semantics described above, avoiding unnecessary executions. However, two other modes exist with the options `--all` and `--dry-run`.
-
-The first one executes Terraform `plan`, `apply`, or `destroy` for all modules, whereas the second is similar to the default mode, producing a list of modules but without running their recipes.
 
 ### Outputs and feedback
 

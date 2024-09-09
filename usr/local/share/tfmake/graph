@@ -17,7 +17,7 @@ function usage() {
 Usage:
   tfmake graph [options]
 
-  This command generate a graph diagram from Terraform modules and their dependencies.
+  This command generate a graph from Terraform modules and their dependencies.
 
 Options:
   -h, --help, help  Show this help output.
