@@ -8,6 +8,8 @@ set -u
   source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/store.sh"
 }
 
+util::context
+
 function usage() {
   cat << EOF
 Usage:

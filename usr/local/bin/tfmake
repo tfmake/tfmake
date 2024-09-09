@@ -43,16 +43,6 @@ EOF
   exit
 }
 
-function context() {
-  store::basepath "${TFMAKE_DATA_DIR}/global/store"
-  store::use config
-
-  TFMAKE_CONTEXT=$(util::global_config_get "context")
-  util::validate_context "${TFMAKE_CONTEXT}"
-
-  export TFMAKE_CONTEXT
-}
-
 [[ $# -eq 0 ]] && usage
 
 CMD="${1-}"
@@ -66,10 +56,7 @@ case "${CMD}" in
     echo "tfmake v${VERSION}"
     exit
     ;;
-  config|context)
-    ;;
-  cleanup|gh-pr-comment|gh-step-summary|makefile|graph|init|run|summary|touch)
-    [[ ! "${1-}" =~ ^(-h|--help|help)$ ]] && context
+  cleanup|config|context|gh-pr-comment|gh-step-summary|graph|init|makefile|run|summary|touch)
     ;;
   *)
     usage

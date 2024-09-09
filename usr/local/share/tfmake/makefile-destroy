@@ -8,6 +8,8 @@ set -u
   source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/store.sh"
 }
 
+util::context
+
 store::basepath "${TFMAKE_DATA_DIR}/destroy/store"
 
 # This process involves two passes: the first pass determines the reverse topological order,

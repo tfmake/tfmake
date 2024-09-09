@@ -8,6 +8,8 @@ set -u
   source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/store.sh"
 }
 
+util::context
+
 store::basepath "${TFMAKE_DATA_DIR}/apply/store"
 
 store::use modules

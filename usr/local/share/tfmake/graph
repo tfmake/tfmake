@@ -8,6 +8,8 @@ set -u
   source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/store.sh"
 }
 
+util::context
+
 CLASS_DEF_DEFAULT=${CLASS_DEF_DEFAULT:-"fill:#ffffff,stroke:#585c5e,color:#585c5e;"}
 CLASS_DEF_SUCCEEDED=${CLASS_DEF_SUCCEEDED:-"fill:#a3cfbb,stroke:#136c44,color:#136c44;"}
 CLASS_DEF_FAILED=${CLASS_DEF_FAILED:-"fill:#f0aeb5,stroke:#af2a36,color:#af2a36;"}
