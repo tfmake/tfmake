@@ -43,6 +43,11 @@ Other Commands:
   touch             Touch modified files.
   version           Show the current version.
 
+Shortcut Commands:
+  plan              Shortcut for core commands using the "plan" context.
+  apply             Shortcut for core commands using the "apply" context.
+  destroy           Shortcut for core commands using the "destroy" context.
+
 GitHub Commands:
   gh-pr-comment     Add a comment to a GitHub pull request.
   gh-step-summary   Add content to GitHub Step Summary.

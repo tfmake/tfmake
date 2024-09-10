@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+set -u
+
+# shellcheck source=/dev/null
+{
+  source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/util.sh"
+  source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/store.sh"
+}
+
+function usage() {
+  cat << EOF
+Usage:
+  tfmake plan [options]
+
+  This command is a shortcut for core commands using the "plan" context.
+
+Options:
+  -h, --help, help  Show this help output.
+EOF
+  exit
+}
+
+case "${1-}" in
+  -h|--help|help)
+    usage
+    ;;
+  ?*)
+    printf "Unknown option: %s\n\n" "${1}"
+    usage
+    ;;
+esac
+
+bash "${TFMAKE_SCRIPT_DIR}"/../share/tfmake/context plan
+bash "${TFMAKE_SCRIPT_DIR}"/../share/tfmake/init
+bash "${TFMAKE_SCRIPT_DIR}"/../share/tfmake/makefile
+bash "${TFMAKE_SCRIPT_DIR}"/../share/tfmake/run --all

@@ -32,6 +32,11 @@ Other Commands:
   touch             Touch modified files.
   version           Show the current version.
 
+Shortcut Commands:
+  plan              Shortcut for core commands using the "plan" context.
+  apply             Shortcut for core commands using the "apply" context.
+  destroy           Shortcut for core commands using the "destroy" context.
+
 GitHub Commands:
   gh-pr-comment     Add a comment to a GitHub pull request.
   gh-step-summary   Add content to GitHub Step Summary.
@@ -56,7 +61,7 @@ case "${CMD}" in
     echo "tfmake v${VERSION}"
     exit
     ;;
-  cleanup|config|context|gh-pr-comment|gh-step-summary|graph|init|makefile|run|summary|touch)
+  apply|cleanup|config|context|destroy|gh-pr-comment|gh-step-summary|graph|init|makefile|plan|run|summary|touch)
     ;;
   *)
     usage
