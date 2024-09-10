@@ -10,17 +10,12 @@ setup() {
   cd_terraform_modules_path
 }
 
-@test "tfmake context" {
-  bash tfmake context plan
-}
-
 @test "tfmake cleanup (1st)" {
   bash tfmake cleanup
 }
 
-@test "tfmake makefile (before init)" {
-  run bash tfmake makefile
-  assert_output "Run 'tfmake init' first."
+@test "tfmake context (1st)" {
+  bash tfmake context plan
 }
 
 @test "tfmake init (with -i)" {
@@ -62,6 +57,15 @@ setup() {
 
 @test "tfmake cleanup (2nd)" {
   bash tfmake cleanup
+}
+
+@test "tfmake context (2nd)" {
+  bash tfmake context plan
+}
+
+@test "tfmake makefile (before init)" {
+  run bash tfmake makefile
+  assert_output "Run 'tfmake init' first."
 }
 
 @test "tfmake init" {

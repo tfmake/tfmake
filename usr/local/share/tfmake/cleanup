@@ -8,8 +8,6 @@ set -u
   source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/store.sh"
 }
 
-util::context
-
 function usage() {
   cat << EOF
 Usage:
@@ -33,6 +31,6 @@ case "${1-}" in
     ;;
 esac
 
-util::log_info "[tfmake:cleanup] cleaning up data directory."
+util::log_info "[tfmake:cleanup] remove the data directory: \"${TFMAKE_DATA_DIR}\"."
 
-rm -rf "${TFMAKE_DATA_DIR:?}/${TFMAKE_CONTEXT}"
+rm -rf "${TFMAKE_DATA_DIR}"
