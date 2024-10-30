@@ -35,7 +35,7 @@ function util::die() {
 function util::splitlines() {
   local lines="${1-}"
 
-  echo "${lines}" | tr '\r\n' ' ' | xargs
+  echo "${lines}" | xargs
 }
 
 function util::append_new_line() {
