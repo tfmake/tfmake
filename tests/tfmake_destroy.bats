@@ -44,6 +44,9 @@ setup() {
   run kv::get C
   assert_output true
 
+  run kv::get B/.terraform/modules/D
+  refute_output
+
   store::use ignore
 
   run kv::get A
@@ -95,6 +98,9 @@ setup() {
 
   run kv::get C
   assert_output true
+
+  run kv::get B/.terraform/modules/D
+  refute_output
 
   store::use dependencies
 

@@ -103,7 +103,7 @@ mtime=$(date +%Y%m%d%H%M.%S)
 
 util::log_info "[tfmake:init] discovering Terraform modules and their dependencies."
 
-while IFS= read -r -d '' file; do
+while IFS= read -r file; do
   module=$(dirname "${file}")
 
   # continue if the module is ignored
@@ -111,9 +111,13 @@ while IFS= read -r -d '' file; do
     continue
   fi
 
-  # otherwise, include it
+  # else include it if it doesn't exist
   store::use modules
-  kv::set "${module}" true
+
+  exist=$(kv::get "${module}")
+  if [[ -z "${exist}" ]]; then
+    kv::set "${module}" true
+  fi
 
   touch -c -m -t "${mtime}" "${module}"
 
@@ -123,4 +127,4 @@ while IFS= read -r -d '' file; do
     store::use dependencies
     kv::set "${module}" "${deps}"
   fi
-done <  <(find -- * -name main.tf -type f -print0)
+done <  <(find . -name ".terraform" -prune -o -name "*.tf" -type f -print | sed 's/\.\///g')

@@ -33,3 +33,4 @@ override.tf.json
 tests/terraform/**/.tfmake
 tests/terraform/**/output.plan
 tests/terraform/**/.terraform.lock.hcl
+tests/bats
