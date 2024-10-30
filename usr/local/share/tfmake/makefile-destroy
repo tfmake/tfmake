@@ -39,7 +39,7 @@ EOF
 done
 
 # second pass
-reverse=$(make -B -i -r -R -f "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/Makefile" | tail -r)
+reverse=$(make -B -i -r -R -f "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/Makefile" | xargs | rev)
 
 cat > "${TFMAKE_DATA_DIR}/destroy/Makefile" << EOF
 SHELL=$(which bash) -o pipefail
