@@ -6,6 +6,11 @@ function hash() {
   printf "%s" "${key}" | md5sum | cut -d' ' -f1
 }
 
+function store::cleanup() {
+  local path="${1-}"
+  rm -rf "${path}"
+}
+
 function store::basepath() {
   local path="${1-}"
 

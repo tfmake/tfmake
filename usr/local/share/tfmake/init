@@ -80,6 +80,7 @@ function get_deps() {
 
 mkdir -p "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}"/{logs,outputs,recipes}
 
+store::cleanup "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/store"
 store::basepath "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/store"
 
 # set ignore modules
