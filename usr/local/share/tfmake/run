@@ -55,19 +55,26 @@ store::basepath "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/store"
 
 util::log_info "[tfmake:run] executing 'terraform ${TFMAKE_CONTEXT}' for modules and their dependencies."
 
+# make options
+options=(-r -R)
+
+if [[ "${TFMAKE_CONTEXT}" != "destroy" ]]; then
+  options+=(-i)
+fi
+
 # "default" mode
 if [[ "${mode}" == "default" ]]; then
-  make -i -r -R -f "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/Makefile" 2> "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/logs/signpost.log"
+  make "${options[@]}" -f "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/Makefile" 2> "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/logs/signpost.log"
 fi
 
 # "all" is useful for drift detection; 'tfmake touch' is not needed.
 if [[ "${mode}" == "all" ]]; then
-  make -B -i -r -R -f "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/Makefile" 2> "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/logs/signpost.log"
+  make "${options[@]}" -B -f "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/Makefile" 2> "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/logs/signpost.log"
 fi
 
 # "dry-run" print the modules that would be executed, but don't execute them.
 if [[ "${mode}" == "dry-run" ]]; then
-  make -t -r -R -f "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/Makefile" | awk '/^touch/ {print $2}'
+  make "${options[@]}" -t -f "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/Makefile" | awk '/^touch/ {print $2}'
 
   # As 'make -t' touch files and fool future invocations; the next calls to 'touch'
   # aim to prevent that behavior.
