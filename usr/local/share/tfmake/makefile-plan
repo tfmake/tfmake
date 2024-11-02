@@ -36,8 +36,8 @@ ${module}: \$(wildcard ${module}/*.tf ${module}/*.tfvars) ${deps}
 ${TAB}@mkdir -p "${TFMAKE_DATA_DIR}/plan/logs/${module}"
 ${TAB}@echo "${module}" >> "${TFMAKE_DATA_DIR}/plan/outputs/visited"
 ${TAB}@\$(call group,${module})
-${TAB}@terraform -chdir="${module}" init -no-color 2>&1 | tee "${TFMAKE_DATA_DIR}/plan/logs/${module}/init.log"
-${TAB}@terraform -chdir="${module}" plan -no-color 2>&1 | tee "${TFMAKE_DATA_DIR}/plan/logs/${module}/plan.log"
+${TAB}@${IAC_TOOL} -chdir="${module}" init -no-color 2>&1 | tee "${TFMAKE_DATA_DIR}/plan/logs/${module}/init.log"
+${TAB}@${IAC_TOOL} -chdir="${module}" plan -no-color 2>&1 | tee "${TFMAKE_DATA_DIR}/plan/logs/${module}/plan.log"
 ${TAB}@\$(endgroup)
 EOF
 done

@@ -59,8 +59,8 @@ ${module}: \$(wildcard ${module}/*.tf ${module}/*.tfvars) ${deps}
 ${TAB}@mkdir -p "${TFMAKE_DATA_DIR}/destroy/logs/${module}"
 ${TAB}@echo "${module}" >> "${TFMAKE_DATA_DIR}/destroy/outputs/visited"
 ${TAB}@\$(call group,${module})
-${TAB}@terraform -chdir="${module}" init -no-color 2>&1 | tee "${TFMAKE_DATA_DIR}/destroy/logs/${module}/init.log"
-${TAB}@terraform -chdir="${module}" apply -destroy -auto-approve -no-color 2>&1 | tee "${TFMAKE_DATA_DIR}/destroy/logs/${module}/destroy.log"
+${TAB}@${IAC_TOOL} -chdir="${module}" init -no-color 2>&1 | tee "${TFMAKE_DATA_DIR}/destroy/logs/${module}/init.log"
+${TAB}@${IAC_TOOL} -chdir="${module}" destroy -auto-approve -no-color 2>&1 | tee "${TFMAKE_DATA_DIR}/destroy/logs/${module}/destroy.log"
 ${TAB}@\$(endgroup)
 EOF
 

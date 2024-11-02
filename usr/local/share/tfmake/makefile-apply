@@ -36,8 +36,8 @@ ${module}: \$(wildcard ${module}/*.tf ${module}/*.tfvars) ${deps}
 ${TAB}@mkdir -p "${TFMAKE_DATA_DIR}/apply/logs/${module}"
 ${TAB}@echo "${module}" >> "${TFMAKE_DATA_DIR}/apply/outputs/visited"
 ${TAB}@\$(call group,${module})
-${TAB}@terraform -chdir="${module}" init -no-color 2>&1 | tee "${TFMAKE_DATA_DIR}/apply/logs/${module}/init.log"
-${TAB}@terraform -chdir="${module}" apply -auto-approve -no-color 2>&1 | tee "${TFMAKE_DATA_DIR}/apply/logs/${module}/apply.log"
+${TAB}@${IAC_TOOL} -chdir="${module}" init -no-color 2>&1 | tee "${TFMAKE_DATA_DIR}/apply/logs/${module}/init.log"
+${TAB}@${IAC_TOOL} -chdir="${module}" apply -auto-approve -no-color 2>&1 | tee "${TFMAKE_DATA_DIR}/apply/logs/${module}/apply.log"
 ${TAB}@\$(endgroup)
 EOF
 done

@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 
+IAC_TOOL=${IAC_TOOL:-"terraform"}
+
 # shellcheck source=/dev/null
-source "${BATS_TESTS_DIR}/../usr/local/include/tfmake/util.sh"
-source "${BATS_TESTS_DIR}/../usr/local/include/tfmake/store.sh"
+{
+  source "${BATS_TESTS_DIR}/../usr/local/include/tfmake/util.sh"
+  source "${BATS_TESTS_DIR}/../usr/local/include/tfmake/store.sh"
+}
 
 TF_MODULES_PATH="${BATS_TESTS_DIR}/terraform/basic"
 
@@ -13,4 +17,6 @@ function cd_terraform_modules_path() {
   if [[ ! -f B/.terraform/modules/D/main.tf ]]; then
     touch B/.terraform/modules/D/main.tf
   fi
+
+  tfmake config --set iactool "${IAC_TOOL}"
 }

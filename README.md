@@ -166,6 +166,14 @@ By default (`tfmake run`), the command calls `make` and runs it with the semanti
 
 The first one executes Terraform `plan`, `apply`, or `destroy` for all modules, whereas the second is similar to the default mode, producing a list of modules but without running their recipes.
 
+### Configuring the Infrastructure as Code Tool
+
+By default, `tfmake` uses `terraform` as its infrastructure as code tool. However, it can also be set to use OpenTofu if preferred.
+
+```bash
+tfmake config --set iactool tofu
+```
+
 ### A special command
 
 #### tfmake touch

@@ -50,6 +50,17 @@ case "${1-}" in
     ;;
 esac
 
+# iactool key
+if [[ "${key}" == "iactool" && "${action}" == "set" ]]; then
+  case "${value}" in
+    terraform|tofu)
+      ;;
+    ?*)
+      util::log_err "Invalid infrastructure as code tool: ${value}"
+      ;;
+  esac
+fi
+
 # set a config value
 if [[ "${action}" == "set" ]]; then
   util::global_config_set "${key}" "${value}"

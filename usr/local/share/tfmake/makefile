@@ -50,6 +50,15 @@ fi
 
 util::global_config_set "cicd" "${TFMAKE_CICD_PLATFORM}"
 
+# infrastructure as code tool
+IAC_TOOL=$(util::global_config_get "iactool")
+
+if [[ -z "${IAC_TOOL}" ]]; then
+  IAC_TOOL="terraform"
+fi
+
+export IAC_TOOL
+
 # add canned recipes
 cp \
   "${TFMAKE_SCRIPT_DIR}/../include/tfmake/recipes/${TFMAKE_CICD_PLATFORM}/grouping.mk" \
