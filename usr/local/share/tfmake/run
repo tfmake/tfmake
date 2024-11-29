@@ -58,7 +58,8 @@ util::log_info "[tfmake:run] executing 'terraform ${TFMAKE_CONTEXT}' for modules
 # make options
 options=(-r -R)
 
-if [[ "${TFMAKE_CONTEXT}" != "destroy" ]]; then
+# Only ignore errors on plan, fail fast on apply/destroy.
+if [[ "${TFMAKE_CONTEXT}" == "plan" ]]; then
   options+=(-i)
 fi
 
