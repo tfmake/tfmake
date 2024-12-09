@@ -80,6 +80,17 @@ function get_deps() {
 
 mkdir -p "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}"/{logs,outputs,recipes}
 
+# defaults
+IAC_TOOL=$(util::global_config_get "iactool")
+if [[ -z "${IAC_TOOL}" ]]; then
+  (util::global_config_set "iactool" "terraform")
+fi
+
+PARALLEL=$(util::global_config_get "parallel")
+if [[ -z "${PARALLEL}" ]]; then
+  (util::global_config_set "parallel" "true")
+fi
+
 store::cleanup "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/store"
 store::basepath "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/store"
 

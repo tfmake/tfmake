@@ -56,7 +56,18 @@ if [[ "${key}" == "iactool" && "${action}" == "set" ]]; then
     terraform|tofu)
       ;;
     ?*)
-      util::log_err "Invalid infrastructure as code tool: ${value}"
+      util::log_err "Invalid value, use 'terraform' or 'tofu'."
+      ;;
+  esac
+fi
+
+# parallel key
+if [[ "${key}" == "parallel" && "${action}" == "set" ]]; then
+  case "${value}" in
+    true|false)
+      ;;
+    ?*)
+      util::log_err "Invalid value, use 'false' or 'true'."
       ;;
   esac
 fi
