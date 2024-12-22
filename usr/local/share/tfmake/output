@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+
+set -u
+
+# shellcheck source=/dev/null
+{
+  source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/util.sh"
+  source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/store.sh"
+}
+
+util::context
+
+function usage() {
+  cat << EOF
+Usage:
+  tfmake output [options]
+
+  This command reads and prints output values from a Terraform module.
+
+Options:
+  -h, --help, help  Show this help output.
+  --module          Module name.
+  --name            Output name.
+  --json            Prints in JSON format.
+EOF
+  exit
+}
+
+[[ $# -eq 0 ]] && usage
+
+module=""
+name=""
+json=""
+
+while :; do
+  case "${1-}" in
+    -h|--help|help)
+      usage
+      ;;
+    --module)
+      module="${2-}"
+      shift
+      ;;
+    --name)
+      name="${2-}"
+      shift
+      ;;
+    --json)
+      json=true
+      ;;
+    ?*)
+      printf "Unknown option: %s\n\n" "${1}"
+      usage
+      ;;
+    *)
+      break
+      ;;
+  esac
+  shift
+done
+
+# exit if not in "apply" context
+[[ "${TFMAKE_CONTEXT}" != "apply" ]] && exit 0
+
+# infrastructure as code tool
+IAC_TOOL=$(util::global_config_get "iactool")
+
+if [[ -z "${IAC_TOOL}" ]]; then
+  IAC_TOOL="terraform"
+fi
+
+# configure options
+options=(-no-color)
+
+if [[ "${json}" == "true" ]]; then
+  options+=(-json)
+fi
+
+if [[ -n "${name}" ]]; then
+  options+=("${name}")
+fi
+
+store::basepath "${TFMAKE_DATA_DIR}/apply/store"
+store::use modules
+
+[[ -z $(kv::get "${module}") ]] && exit
+
+pushd "${module}" > /dev/null || exit
+${IAC_TOOL} output "${options[@]}" 2>/dev/null
+popd > /dev/null || exit

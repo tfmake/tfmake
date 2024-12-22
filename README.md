@@ -39,6 +39,7 @@ Other Commands:
   cleanup           Cleanup the data directory.
   config            Modify tfmake configuration.
   graph             Generate a graph from Terraform modules and their dependencies.
+  output            Reads and prints output values from a Terraform module.
   summary           Create a Markdown summary.
   touch             Touch modified files.
   version           Show the current version.

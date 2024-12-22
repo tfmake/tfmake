@@ -28,6 +28,7 @@ Other Commands:
   cleanup           Cleanup the data directory.
   config            Modify tfmake configuration.
   graph             Generate a graph from Terraform modules and their dependencies.
+  output            Reads and prints output values from a Terraform module.
   summary           Create a Markdown summary.
   touch             Touch modified files.
   version           Show the current version.
@@ -61,7 +62,7 @@ case "${CMD}" in
     echo "tfmake v${VERSION}"
     exit
     ;;
-  apply|cleanup|config|context|destroy|gh-pr-comment|gh-step-summary|graph|init|makefile|plan|run|summary|touch)
+  apply|cleanup|config|context|destroy|gh-pr-comment|gh-step-summary|graph|init|makefile|output|plan|run|summary|touch)
     ;;
   *)
     usage
