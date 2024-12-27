@@ -19,8 +19,8 @@ Usage:
 
 Options:
   -h, --help, help  Show this help output.
-  --module          Module name.
-  --name            Output name.
+  --module          The module name.
+  --name            The output name.
   --json            Prints in JSON format.
 EOF
   exit
@@ -59,9 +59,6 @@ while :; do
   shift
 done
 
-# exit if not in "apply" context
-[[ "${TFMAKE_CONTEXT}" != "apply" ]] && exit 0
-
 # infrastructure as code tool
 IAC_TOOL=$(util::global_config_get "iactool")
 
@@ -86,5 +83,6 @@ store::use modules
 [[ -z $(kv::get "${module}") ]] && exit
 
 pushd "${module}" > /dev/null || exit
+${IAC_TOOL} init > /dev/null
 ${IAC_TOOL} output "${options[@]}" 2>/dev/null
 popd > /dev/null || exit
