@@ -66,8 +66,8 @@ setup() {
   bash tfmake context plan
 }
 
-@test "tfmake makefile (before init)" {
-  run bash tfmake makefile
+@test "tfmake generate (before init)" {
+  run bash tfmake generate
   assert_output "Run 'tfmake init' first."
 }
 
@@ -108,37 +108,37 @@ setup() {
   assert_output C
 }
 
-@test "tfmake run (before makefile)" {
+@test "tfmake run (before generate)" {
   run bash tfmake run
-  assert_output "Run 'tfmake makefile' first."
+  assert_output "Run 'tfmake generate' first."
 }
 
-@test "tfmake makefile" {
-  bash tfmake makefile
+@test "tfmake generate" {
+  bash tfmake generate
   assert_file_exist ".tfmake/plan/Makefile"
 }
 
-@test "tfmake makefile (local log grouping on)" {
-  bash tfmake makefile
+@test "tfmake generate (local log grouping on)" {
+  bash tfmake generate
 
   run util::global_config_get "cicd"
   assert_output "local"
 }
 
-@test "tfmake makefile (github log grouping on)" {
+@test "tfmake generate (github log grouping on)" {
   export GITHUB_ACTIONS=true
 
-  bash tfmake makefile
+  bash tfmake generate
 
   run util::global_config_get "cicd"
   assert_output "github"
 }
 
-@test "tfmake makefile (github log grouping off)" {
+@test "tfmake generate (github log grouping off)" {
   export GITHUB_ACTIONS=true
   export TFMAKE_LOG_GROUPING=false
 
-  bash tfmake makefile
+  bash tfmake generate
 
   run util::global_config_get "cicd"
   assert_output "local"

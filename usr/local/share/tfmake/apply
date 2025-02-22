@@ -33,5 +33,5 @@ esac
 
 bash "${TFMAKE_SCRIPT_DIR}"/../share/tfmake/context apply
 bash "${TFMAKE_SCRIPT_DIR}"/../share/tfmake/init
-bash "${TFMAKE_SCRIPT_DIR}"/../share/tfmake/makefile
+bash "${TFMAKE_SCRIPT_DIR}"/../share/tfmake/generate
 bash "${TFMAKE_SCRIPT_DIR}"/../share/tfmake/run --all

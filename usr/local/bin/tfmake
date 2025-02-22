@@ -21,7 +21,7 @@ Usage:
 Core Commands:
   context           Set the execution context: plan, apply, or destroy.
   init              Initialize the data directory for Terraform execution.
-  makefile          Generate a Makefile for Terraform execution.
+  generate          Generate a Makefile for Terraform execution.
   run               Run the generated Makefile for Terraform execution.
 
 Other Commands:
@@ -62,7 +62,11 @@ case "${CMD}" in
     echo "tfmake v${VERSION}"
     exit
     ;;
-  apply|cleanup|config|context|destroy|gh-pr-comment|gh-step-summary|graph|init|makefile|output|plan|run|summary|touch)
+  makefile)
+    CMD=generate
+    util::log_info "makefile command is deprecated, use generate instead."
+    ;;
+  apply|cleanup|config|context|destroy|generate|gh-pr-comment|gh-step-summary|graph|init|output|plan|run|summary|touch)
     ;;
   *)
     usage

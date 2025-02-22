@@ -32,7 +32,7 @@ Usage:
 Core Commands:
   context           Set the execution context: plan, apply, or destroy.
   init              Initialize the data directory for Terraform execution.
-  makefile          Generate a Makefile for Terraform execution.
+  generate          Generate a Makefile for Terraform execution.
   run               Run the generated Makefile for Terraform execution.
 
 Other Commands:
@@ -94,14 +94,14 @@ classDef secondary fill:#fee69b,stroke:#fee69b,color:#987405;
 
 context("tfmake context")
 init("tfmake init")
-makefile("tfmake makefile")
+generate("tfmake generate")
 run("tfmake run")
 
-context --> init --> makefile --> run
+context --> init --> generate --> run
 
 context:::primary
 init:::primary
-makefile:::primary
+generate:::primary
 run:::primary
 ```
 
@@ -127,12 +127,12 @@ Sometimes, a requirement arises to ignore some modules inside a project. The opt
 tfmake init -i "X Y Z"
 ```
 
-#### tfmake makefile
+#### tfmake generate
 
 This command acts like a code generator, using the information gathered by **init** to create a `Makefile`. Each module is added as a _target_, with their files and dependencies as _prerequisites_. The **tfmake** context determines the Terraform command to use as part of the _target's recipes_.
 
 ```
-tfmake makefile
+tfmake generate
 ```
 
 What follows is an adapted example for a three-module project plan `Makefile`.
