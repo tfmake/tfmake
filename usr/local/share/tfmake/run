@@ -53,7 +53,7 @@ truncate -s 0 "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/outputs/visited"
 
 store::basepath "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/store"
 
-util::log_info "[tfmake:run] executing 'terraform ${TFMAKE_CONTEXT}' for modules and their dependencies."
+util::log_info "[tfmake:run] running 'terraform ${TFMAKE_CONTEXT}' for modules and their dependencies."
 
 # make options
 options=(-r -R)

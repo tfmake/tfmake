@@ -15,7 +15,7 @@ function usage() {
 Usage:
   tfmake touch [options]
 
-  This command touch modified files.
+  This command mark modified files to trigger necessary updates.
 
 Options:
   -h, --help, help  Show this help output.

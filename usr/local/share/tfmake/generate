@@ -15,7 +15,7 @@ function usage() {
 Usage:
   tfmake generate [options]
 
-  This command generate a Makefile for Terraform execution.
+  This command create a Makefile to orchestrate the Terraform execution.
 
 Options:
   -h, --help, help  Show this help output.

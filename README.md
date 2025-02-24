@@ -27,35 +27,34 @@ sudo chmod +x /usr/local/bin/tfmake
 
 ```
 Usage:
-  tfmake command [options]
+  tfmake <command> [options]
 
 Core Commands:
-  context           Set the execution context: plan, apply, or destroy.
+  context           Define the execution context: plan, apply, or destroy.
   init              Initialize the data directory for Terraform execution.
-  generate          Generate a Makefile for Terraform execution.
+  generate          Create a Makefile to orchestrate the Terraform execution.
   run               Run the generated Makefile for Terraform execution.
 
 Other Commands:
   cleanup           Cleanup the data directory.
-  config            Modify tfmake configuration.
-  graph             Generate a graph from Terraform modules and their dependencies.
-  output            Reads and prints output values from a Terraform module.
-  summary           Create a Markdown summary.
-  touch             Touch modified files.
-  version           Show the current version.
+  config            Configure tfmake settings.
+  graph             Visualize Terraform modules and their dependencies.
+  output            Display output values from a Terraform module.
+  summary           Generate a Markdown summary of Terraform execution logs.
+  touch             Mark modified files to trigger necessary updates.
 
 Shortcut Commands:
-  plan              Shortcut for core commands using the "plan" context.
-  apply             Shortcut for core commands using the "apply" context.
-  destroy           Shortcut for core commands using the "destroy" context.
+  plan              Execute core commands using the "plan" context.
+  apply             Execute core commands using the "apply" context.
+  destroy           Execute core commands using the "destroy" context.
 
 GitHub Commands:
-  gh-pr-comment     Add a comment to a GitHub pull request.
-  gh-step-summary   Add content to GitHub Step Summary.
+  gh-pr-comment     Post a comment on a GitHub pull request.
+  gh-step-summary   Append content to GitHub Step Summary.
 
-Global options:
-  -h, --help, help  Print this help and exit.
-  -v, --version     An alias for the "version" subcommand.
+Global Options:
+  -h, --help, help  Display this help message and exit.
+  -v, --version     Alias for the "version" command.
 ```
 
 ## How tfmake works

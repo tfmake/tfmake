@@ -15,7 +15,7 @@ function usage() {
 Usage:
   tfmake output [options]
 
-  This command reads and prints output values from a Terraform module.
+  This command display output values from a Terraform module.
 
 Options:
   -h, --help, help  Show this help output.

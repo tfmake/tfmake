@@ -13,7 +13,7 @@ function usage() {
 Usage:
   tfmake config [options]
 
-  This command modify tfmake configuration.
+  This command configure tfmake settings.
 
 Options:
   -h, --help, help  Show this help output.

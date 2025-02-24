@@ -13,7 +13,7 @@ function usage() {
 Usage:
   tfmake plan [options]
 
-  This command is a shortcut for core commands using the "plan" context.
+  This command execute core commands using the "plan" context.
 
 Options:
   -h, --help, help  Show this help output.

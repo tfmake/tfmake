@@ -15,7 +15,7 @@ function usage() {
 Usage:
   tfmake gh-step-summary [options]
 
-  This command add content to GitHub Step Summary.
+  This command append content to GitHub Step Summary.
 
 Options:
   -h, --help, help  Show this help output.
@@ -33,7 +33,7 @@ case "${1-}" in
     ;;
 esac
 
-util::log_info "[tfmake:gh-step-summary] adding Job Step Summary from 'terraform ${TFMAKE_CONTEXT}' execution logs."
+util::log_info "[tfmake:gh-step-summary] appending content to Job Step Summary from 'terraform ${TFMAKE_CONTEXT}' execution logs."
 
 GITHUB_STEP_SUMMARY=${GITHUB_STEP_SUMMARY:-"/dev/null"}
 cat "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/outputs/summary.md" >> "${GITHUB_STEP_SUMMARY}"

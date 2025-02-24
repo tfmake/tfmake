@@ -15,7 +15,7 @@ function usage() {
 Usage:
   tfmake gh-pr-comment [options]
 
-  This command add a comment to a GitHub pull request.
+  This command post a comment on a GitHub pull request.
 
 Options:
   -h, --help, help  Show this help output.
@@ -88,7 +88,7 @@ util::file_exist_condition \
   "tfmake summary"
 
 # subcommand
-util::log_info "[tfmake:gh-pr-comment] adding comments to PR from 'terraform ${TFMAKE_CONTEXT}' execution logs."
+util::log_info "[tfmake:gh-pr-comment] posting comments to pull request from 'terraform ${TFMAKE_CONTEXT}' execution logs."
 
 size=$(wc -c "${SUMMARY_FILE}" | awk '{print $1}')
 
