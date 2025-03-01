@@ -29,7 +29,7 @@ Other Commands:
   config            Configure tfmake settings.
   graph             Visualize Terraform modules and their dependencies.
   output            Display output values from a Terraform module.
-  summary           Generate a Markdown summary of Terraform execution logs.
+  summary           Generate a Markdown summary from Terraform execution logs.
   touch             Mark modified files to trigger necessary updates.
 
 Shortcut Commands:

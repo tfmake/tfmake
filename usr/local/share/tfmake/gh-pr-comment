@@ -88,7 +88,7 @@ util::file_exist_condition \
   "tfmake summary"
 
 # subcommand
-util::log_info "[tfmake:gh-pr-comment] posting comments to pull request from 'terraform ${TFMAKE_CONTEXT}' execution logs."
+util::log_info "[tfmake:gh-pr-comment] posting comments to pull request from terraform execution logs."
 
 size=$(wc -c "${SUMMARY_FILE}" | awk '{print $1}')
 

@@ -15,7 +15,7 @@ function usage() {
 Usage:
   tfmake summary [options]
 
-  This command generate a Markdown summary of Terraform execution logs.
+  This command generate a Markdown summary from Terraform execution logs.
 
 Options:
   -h, --help, help  Show this help output.
@@ -52,7 +52,7 @@ util::file_exist_condition \
   "tfmake run"
 
 # subcommand
-util::log_info "[tfmake:summary] generating a Markdown summary from 'terraform ${TFMAKE_CONTEXT}' execution logs."
+util::log_info "[tfmake:summary] generating a Markdown summary from terraform execution logs."
 
 truncate -s 0 "${SUMMARY_FILE}" "${BREADCRUMBS_FILE}"
 
