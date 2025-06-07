@@ -7,6 +7,8 @@ setup() {
   bats_load_library "bats-assert"
   bats_load_library "bats-file"
 
+  export TFMAKE_DATA_DIR=".tfmake/020_tfmake_config"
+
   cd_terraform_modules_path
 }
 

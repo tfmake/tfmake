@@ -7,6 +7,8 @@ setup() {
   bats_load_library "bats-assert"
   bats_load_library "bats-file"
 
+  export TFMAKE_DATA_DIR=".tfmake/050_tfmake_destroy"
+
   cd_terraform_modules_path
 }
 
@@ -24,17 +26,17 @@ setup() {
   # directory structure
   assert_dir_exist ".tfmake"
 
-  assert_dir_exist ".tfmake/destroy"
-  assert_dir_exist ".tfmake/destroy/logs"
-  assert_dir_exist ".tfmake/destroy/outputs"
+  assert_dir_exist "${TFMAKE_DATA_DIR}/destroy"
+  assert_dir_exist "${TFMAKE_DATA_DIR}/destroy/logs"
+  assert_dir_exist "${TFMAKE_DATA_DIR}/destroy/outputs"
 
-  assert_dir_exist ".tfmake/destroy/store"
-  assert_dir_exist ".tfmake/destroy/store/modules"
-  assert_dir_exist ".tfmake/destroy/store/dependencies"
-  assert_dir_exist ".tfmake/destroy/store/ignore"
+  assert_dir_exist "${TFMAKE_DATA_DIR}/destroy/store"
+  assert_dir_exist "${TFMAKE_DATA_DIR}/destroy/store/modules"
+  assert_dir_exist "${TFMAKE_DATA_DIR}/destroy/store/dependencies"
+  assert_dir_exist "${TFMAKE_DATA_DIR}/destroy/store/ignore"
 
   # kv store
-  store::basepath .tfmake/destroy/store
+  store::basepath ${TFMAKE_DATA_DIR}/destroy/store
 
   store::use modules
 
@@ -77,16 +79,16 @@ setup() {
   # directory structure
   assert_dir_exist ".tfmake"
 
-  assert_dir_exist ".tfmake/destroy"
-  assert_dir_exist ".tfmake/destroy/logs"
-  assert_dir_exist ".tfmake/destroy/outputs"
+  assert_dir_exist "${TFMAKE_DATA_DIR}/destroy"
+  assert_dir_exist "${TFMAKE_DATA_DIR}/destroy/logs"
+  assert_dir_exist "${TFMAKE_DATA_DIR}/destroy/outputs"
 
-  assert_dir_exist ".tfmake/destroy/store"
-  assert_dir_exist ".tfmake/destroy/store/modules"
-  assert_dir_exist ".tfmake/destroy/store/dependencies"
+  assert_dir_exist "${TFMAKE_DATA_DIR}/destroy/store"
+  assert_dir_exist "${TFMAKE_DATA_DIR}/destroy/store/modules"
+  assert_dir_exist "${TFMAKE_DATA_DIR}/destroy/store/dependencies"
 
   # kv store
-  store::basepath .tfmake/destroy/store
+  store::basepath ${TFMAKE_DATA_DIR}/destroy/store
 
   store::use modules
 
@@ -115,7 +117,7 @@ setup() {
 
 @test "tfmake generate" {
   bash tfmake generate
-  assert_file_exist ".tfmake/destroy/Makefile"
+  assert_file_exist "${TFMAKE_DATA_DIR}/destroy/Makefile"
 }
 
 @test "tfmake generate (local log grouping on)" {
@@ -158,7 +160,7 @@ setup() {
   bash tfmake touch -f "A/main.tf A/terraform.tfvars"
 
   # kv store
-  store::basepath .tfmake/destroy/store
+  store::basepath ${TFMAKE_DATA_DIR}/destroy/store
   store::use modified
 
   run util::splitlines "$(kv::keys)"
@@ -169,7 +171,7 @@ setup() {
   bash tfmake touch -f C/main.tf -f C/terraform.tfvars
 
   # kv store
-  store::basepath .tfmake/destroy/store
+  store::basepath ${TFMAKE_DATA_DIR}/destroy/store
   store::use modified
 
   run util::splitlines "$(kv::keys)"
@@ -179,8 +181,8 @@ setup() {
 @test "tfmake run" {
   bash tfmake run
 
-  assert_file_exist ".tfmake/destroy/outputs/visited"
-  run cat ".tfmake/destroy/outputs/visited"
+  assert_file_exist "${TFMAKE_DATA_DIR}/destroy/outputs/visited"
+  run cat "${TFMAKE_DATA_DIR}/destroy/outputs/visited"
 
   assert_output << EOF
 C
@@ -189,8 +191,8 @@ EOF
 
   # terraform logs
   for key in $(util::splitlines "$(kv::keys)"); do
-    assert_file_exist ".tfmake/destroy/logs/${key}/init.log"
-    assert_file_exist ".tfmake/destroy/logs/${key}/destroy.log"
+    assert_file_exist "${TFMAKE_DATA_DIR}/destroy/logs/${key}/init.log"
+    assert_file_exist "${TFMAKE_DATA_DIR}/destroy/logs/${key}/destroy.log"
   done
 }
 
@@ -202,8 +204,8 @@ EOF
 @test "tfmake run (all)" {
   bash tfmake run --all
 
-  assert_file_exist ".tfmake/destroy/outputs/visited"
-  run cat ".tfmake/destroy/outputs/visited"
+  assert_file_exist "${TFMAKE_DATA_DIR}/destroy/outputs/visited"
+  run cat "${TFMAKE_DATA_DIR}/destroy/outputs/visited"
 
   assert_output << EOF
 B
@@ -213,8 +215,8 @@ EOF
 
   # terraform logs
   for key in $(util::splitlines "$(kv::keys)"); do
-    assert_file_exist ".tfmake/destroy/logs/${key}/init.log"
-    assert_file_exist ".tfmake/destroy/logs/${key}/destroy.log"
+    assert_file_exist "${TFMAKE_DATA_DIR}/destroy/logs/${key}/init.log"
+    assert_file_exist "${TFMAKE_DATA_DIR}/destroy/logs/${key}/destroy.log"
   done
 }
 
@@ -240,23 +242,23 @@ EOF
 
 @test "tfmake graph" {
   bash tfmake graph
-  assert_file_exist ".tfmake/destroy/outputs/mermaid.md"
+  assert_file_exist "${TFMAKE_DATA_DIR}/destroy/outputs/mermaid.md"
 }
 
 @test "tfmake summary" {
   bash tfmake summary
-  assert_file_exist ".tfmake/destroy/outputs/summary.md"
+  assert_file_exist "${TFMAKE_DATA_DIR}/destroy/outputs/summary.md"
 }
 
 @test "tfmake summary (without outputs)" {
   run bash tfmake summary --no-outputs
-  assert_file_exist ".tfmake/destroy/outputs/summary.md"
+  assert_file_exist "${TFMAKE_DATA_DIR}/destroy/outputs/summary.md"
 }
 
 @test "tfmake summary (title)" {
   export TFMAKE_SUMMARY_TITLE="Basic Project Destroy"
   bash tfmake summary
-  assert_file_contains ".tfmake/destroy/outputs/summary.md" "${TFMAKE_SUMMARY_TITLE}"
+  assert_file_contains "${TFMAKE_DATA_DIR}/destroy/outputs/summary.md" "${TFMAKE_SUMMARY_TITLE}"
 }
 
 @test "tfmake gh-pr-comment (no --number)" {
@@ -265,10 +267,10 @@ EOF
 }
 
 @test "tfmake gh-pr-comment (with --dry-run)" {
-  size=$(wc -c ".tfmake/destroy/outputs/summary.md" | awk '{print $1-1}')
+  size=$(wc -c "${TFMAKE_DATA_DIR}/destroy/outputs/summary.md" | awk '{print $1-1}')
   export MAX_COMMENT_SIZE=${size}
 
   run bash tfmake gh-pr-comment --dry-run
-  assert_file_exist ".tfmake/destroy/outputs/fragment-1.md"
-  assert_file_exist ".tfmake/destroy/outputs/fragment-2.md"
+  assert_file_exist "${TFMAKE_DATA_DIR}/destroy/outputs/fragment-1.md"
+  assert_file_exist "${TFMAKE_DATA_DIR}/destroy/outputs/fragment-2.md"
 }
