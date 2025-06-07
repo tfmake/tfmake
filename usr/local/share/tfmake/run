@@ -64,8 +64,8 @@ if [[ "${PARALLEL}" == "true" ]]; then
   options+=(-O -j "$(nproc)")
 fi
 
-# Only ignore errors on plan, fail fast on apply/destroy.
-if [[ "${TFMAKE_CONTEXT}" == "plan" ]]; then
+# Only ignore errors on validate or plan, fail fast on apply/destroy.
+if [[ "${TFMAKE_CONTEXT}" == "validate" || "${TFMAKE_CONTEXT}" == "plan" ]]; then
   options+=(-i)
 fi
 
@@ -107,7 +107,7 @@ if [[ -f "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/outputs/visited" ]]; then
   for node in ${nodes}; do
     value=true
 
-    grep -qE "make: \[.*${node}\] Error .+" "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/logs/signpost.log"
+    grep -qE "make:.*\[.*${node}\] Error .+" "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/logs/signpost.log"
     [[ $? -eq 0 ]] && value=false && exit_code=1
 
     kv::set "${node}" "${value}"

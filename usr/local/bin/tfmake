@@ -19,7 +19,7 @@ Usage:
   tfmake <command> [options]
 
 Core Commands:
-  context           Define the execution context: plan, apply, or destroy.
+  context           Define the execution context: validate, plan, apply, or destroy.
   init              Initialize the data directory for Terraform execution.
   generate          Create a Makefile to orchestrate the Terraform execution.
   run               Run the generated Makefile for Terraform execution.
@@ -33,6 +33,7 @@ Other Commands:
   touch             Mark modified files to trigger necessary updates.
 
 Shortcut Commands:
+  validate          Execute core commands using the "validate" context.
   plan              Execute core commands using the "plan" context.
   apply             Execute core commands using the "apply" context.
   destroy           Execute core commands using the "destroy" context.
@@ -65,7 +66,7 @@ case "${CMD}" in
     CMD=generate
     util::log_info "makefile command is deprecated, use generate instead."
     ;;
-  apply|cleanup|config|context|destroy|generate|gh-pr-comment|gh-step-summary|graph|init|output|plan|run|summary|touch)
+  apply|cleanup|config|context|destroy|generate|gh-pr-comment|gh-step-summary|graph|init|output|plan|run|summary|touch|validate)
     ;;
   *)
     usage

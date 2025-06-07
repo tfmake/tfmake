@@ -30,7 +30,7 @@ Usage:
   tfmake <command> [options]
 
 Core Commands:
-  context           Define the execution context: plan, apply, or destroy.
+  context           Define the execution context: validate, plan, apply, or destroy.
   init              Initialize the data directory for Terraform execution.
   generate          Create a Makefile to orchestrate the Terraform execution.
   run               Run the generated Makefile for Terraform execution.
@@ -44,6 +44,7 @@ Other Commands:
   touch             Mark modified files to trigger necessary updates.
 
 Shortcut Commands:
+  validate          Execute core commands using the "validate" context.
   plan              Execute core commands using the "plan" context.
   apply             Execute core commands using the "apply" context.
   destroy           Execute core commands using the "destroy" context.
@@ -106,7 +107,7 @@ run:::primary
 
 #### tfmake context
 
-Allows to define the Terraform command to execute: `plan`, `apply`, or `destroy`.
+Allows to define the Terraform command to execute: `validate`, `plan`, `apply`, or `destroy`.
 
 ```
 tfmake context plan
@@ -154,7 +155,7 @@ C: $(wildcard C/*.tf C/*.tfvars) A B
 
 When the `Makefile` is there, it's possible to use it for running the [make](https://man7.org/linux/man-pages/man1/make.1.html) utility.
 
-One of the goals of **tfmake** is to avoid unnecessary executions. If a module (_target_) files or their dependencies don't change, there is no need to run a `plan`, `apply`, or `destroy` on it. This behavior, derived from the `make` way of working, reduces the execution time and favors cost optimization.
+One of the goals of **tfmake** is to avoid unnecessary executions. If a module (_target_) files or their dependencies don't change, there is no need to run a `validate`, `plan`, `apply`, or `destroy` on it. This behavior, derived from the `make` way of working, reduces the execution time and favors cost optimization.
 
 > The make program uses the makefile description and the last-modification times of the files to decide which of the files need to be updated.
 
@@ -164,7 +165,7 @@ As mentioned before, a `Makefile` is the entrypoint for `make` execution. The **
 
 By default (`tfmake run`), the command calls `make` and runs it with the semantics described above, avoiding unnecessary executions. However, two other modes exist with the options `--all` and `--dry-run`.
 
-The first one executes Terraform `plan`, `apply`, or `destroy` for all modules, whereas the second is similar to the default mode, producing a list of modules but without running their recipes.
+The first one executes Terraform `validate`, `plan`, `apply`, or `destroy` for all modules, whereas the second is similar to the default mode, producing a list of modules but without running their recipes.
 
 ### Configuring the Infrastructure as Code Tool
 

@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+set -u
+
+# shellcheck source=/dev/null
+{
+  source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/util.sh"
+  source "${TFMAKE_SCRIPT_DIR}/../include/tfmake/store.sh"
+}
+
+util::context
+
+store::basepath "${TFMAKE_DATA_DIR}/validate/store"
+
+store::use modules
+modules=$(kv::keys)
+
+cat > "${TFMAKE_DATA_DIR}/validate/Makefile" << EOF
+SHELL=$(which bash) -o pipefail
+export TF_IN_AUTOMATION=true
+
+include ${TFMAKE_DATA_DIR}/validate/recipes/grouping.mk
+
+all: $(util::splitlines "${modules}")
+EOF
+
+store::use dependencies
+for module in ${modules}; do
+  deps=$(kv::get "${module}")
+  [[ -n ${deps} ]] && deps=${deps//,/ }
+
+  util::append_new_line "${TFMAKE_DATA_DIR}/validate/Makefile"
+
+  cat >> "${TFMAKE_DATA_DIR}/validate/Makefile" << EOF
+${module}: \$(wildcard ${module}/*.tf ${module}/*.tfvars) ${deps}
+${TAB}@mkdir -p "${TFMAKE_DATA_DIR}/validate/logs/${module}"
+${TAB}@echo "${module}" >> "${TFMAKE_DATA_DIR}/validate/outputs/visited"
+${TAB}@\$(call group,${module})
+${TAB}@${IAC_TOOL} -chdir="${module}" init -backend=false -no-color 2>&1 | tee "${TFMAKE_DATA_DIR}/validate/logs/${module}/init.log"
+${TAB}@${IAC_TOOL} -chdir="${module}" validate -no-color 2>&1 | tee "${TFMAKE_DATA_DIR}/validate/logs/${module}/validate.log"
+${TAB}@touch ${module}
+${TAB}@\$(endgroup)
+EOF
+done

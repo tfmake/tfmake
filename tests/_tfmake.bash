@@ -20,3 +20,30 @@ function cd_terraform_modules_path() {
 
   tfmake config --set iactool "${IAC_TOOL}"
 }
+
+function add_invalid_module() {
+  cd "${TF_MODULES_PATH}" || exit
+
+  mkdir -p "${1-}"
+  if [[ ! -f E/main.tf ]]; then
+    cat << EOF > "${1-}/main.tf"
+resource "random_id" "id" {
+  keepers = {
+    // var content is missing, therefore MUST fail
+    content = var.content
+  }
+
+  byte_length = 8
+}
+
+output "id" {
+  value = random_id.id.id
+}
+EOF
+  fi
+}
+
+function remove_invalid_module() {
+  cd "${TF_MODULES_PATH}" || exit
+  rm -rf "${1-}"
+}

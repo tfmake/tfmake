@@ -56,12 +56,12 @@ function util::file_exist_condition () {
 function util::context() {
   TFMAKE_CONTEXT=$(util::global_config_get "context")
 
-  if [[ ! "${TFMAKE_CONTEXT}" =~ ^(plan|apply|destroy)$ ]]; then
+  if [[ ! "${TFMAKE_CONTEXT}" =~ ^(validate|plan|apply|destroy)$ ]]; then
     util::die "Invalid context: ${TFMAKE_CONTEXT}"
   fi
 
   if [[ -z "${TFMAKE_CONTEXT}" ]]; then
-    util::die "Run 'tfmake context <plan|apply|destroy>' first."
+    util::die "Run 'tfmake context <validate|plan|apply|destroy>' first."
   fi
 }
 
