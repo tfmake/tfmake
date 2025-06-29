@@ -19,19 +19,19 @@ Usage:
 
 Options:
   -h, --help, help  Show this help output.
-  -i, --ignore      List of modules to ignore.
+  --exclude         List of modules to exclude.
 EOF
   exit
 }
 
-ignore=""
+exclude=""
 
 case "${1-}" in
   -h|--help|help)
     usage
     ;;
-  -i|--ignore)
-    ignore="${2-}"
+  -i|--exclude)
+    exclude="${2-}"
     ;;
   ?*)
     printf "Unknown option: %s\n\n" "${1}"
@@ -39,12 +39,12 @@ case "${1-}" in
     ;;
 esac
 
-function is_ignored() {
+function is_excluded() {
   local module="${1-}"
   local result=false
 
-  if [[ -n "${ignore}" ]]; then
-    store::use ignore
+  if [[ -n "${exclude}" ]]; then
+    store::use exclude
     if [[ -n $(kv::get "${module}") ]]; then
       result=true
     fi
@@ -61,13 +61,13 @@ function get_deps() {
     deps=$(yq -o=csv ".dependencies" "${module}/.tfmake")
   fi
 
-  # sanitize deps, by removing the module itself and ignored modules
+  # sanitize deps, by removing the module itself and excluded modules
   local sep=""
   local items=${deps//,/ }
   deps=""
 
   for item in ${items}; do
-    if [[ "${item}" == "${module}" || $(is_ignored "${item}") == "true" ]]; then
+    if [[ "${item}" == "${module}" || $(is_excluded "${item}") == "true" ]]; then
       continue
     fi
 
@@ -94,13 +94,13 @@ fi
 store::cleanup "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/store"
 store::basepath "${TFMAKE_DATA_DIR}/${TFMAKE_CONTEXT}/store"
 
-# set ignore modules
-if [[ -n "${ignore}" ]]; then
-  util::log_info "[tfmake:init] setting ignored modules."
+# set exclude modules
+if [[ -n "${exclude}" ]]; then
+  util::log_info "[tfmake:init] setting excluded modules."
 
-  store::use ignore
+  store::use exclude
 
-  for module in ${ignore}; do
+  for module in ${exclude}; do
     kv::set "${module}" true
   done
 fi
@@ -118,8 +118,8 @@ util::log_info "[tfmake:init] discovering Terraform modules and their dependenci
 while IFS= read -r file; do
   module=$(dirname "${file}")
 
-  # continue if the module is ignored
-  if [[ $(is_ignored "${module}") == "true" ]]; then
+  # continue if the module is excluded
+  if [[ $(is_excluded "${module}") == "true" ]]; then
     continue
   fi
 

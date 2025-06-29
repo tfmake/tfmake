@@ -33,7 +33,7 @@ setup() {
   assert_dir_exist "${TFMAKE_DATA_DIR}/validate/store"
   assert_dir_exist "${TFMAKE_DATA_DIR}/validate/store/modules"
   assert_dir_exist "${TFMAKE_DATA_DIR}/validate/store/dependencies"
-  assert_dir_exist "${TFMAKE_DATA_DIR}/validate/store/ignore"
+  assert_dir_exist "${TFMAKE_DATA_DIR}/validate/store/exclude"
 
   # kv store
   store::basepath ${TFMAKE_DATA_DIR}/validate/store
@@ -49,7 +49,7 @@ setup() {
   run kv::get B/.terraform/modules/D
   refute_output
 
-  store::use ignore
+  store::use exclude
 
   run kv::get A
   assert_output true

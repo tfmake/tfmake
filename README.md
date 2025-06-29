@@ -121,7 +121,7 @@ As the name suggests, this command deals with the initialization process, used t
 tfmake init
 ```
 
-Sometimes, a requirement arises to ignore some modules inside a project. The option `-i|--ignore` supports it, by passing  a space separated list of modules.
+Sometimes, a requirement arises to exclude some modules inside a project. The option `--exclude` supports it, by passing  a space separated list of modules.
 
 ```
 tfmake init -i "X Y Z"
